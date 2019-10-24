@@ -211,7 +211,7 @@ int SMSBL::WriteOfs(u8 ID, s16 Ofs)
 {
 	if(Ofs<0){
 		Ofs = -Ofs;
-		Ofs |= (1<<15);
+		Ofs |= (1<<11);
 	}
 	return writeWord(ID, SMSBL_OFS_L, Ofs);
 }
