@@ -80,9 +80,9 @@
 #define SMSBL_PRESENT_CURRENT_L 69
 #define SMSBL_PRESENT_CURRENT_H 70
 
-#include "SCSerail.h"
+#include "SCSerial.h"
 
-class SMSBL : public SCSerail
+class SMSBL : public SCSerial
 {
 public:
 	SMSBL();

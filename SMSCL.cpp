@@ -1,8 +1,8 @@
 /*
  * SMSCL.cpp
- * ·ÉÌØSMSCLÏµÁÐ´®ÐÐ¶æ»ú½Ó¿Ú
- * ÈÕÆÚ: 2017.11.21
- * ×÷Õß: Ì·ÐÛÀÖ
+ * ï¿½ï¿½ï¿½ï¿½SMSCLÏµï¿½Ð´ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ó¿ï¿½
+ * ï¿½ï¿½ï¿½ï¿½: 2017.11.21
+ * ï¿½ï¿½ï¿½ï¿½: Ì·ï¿½ï¿½ï¿½ï¿½
  */
 
 
@@ -14,11 +14,11 @@ SMSCL::SMSCL()
 	End = 0;
 }
 
-SMSCL::SMSCL(u8 End):SCSerail(End)
+SMSCL::SMSCL(u8 End): SCSerial(End)
 {
 }
 
-SMSCL::SMSCL(u8 End, u8 Level):SCSerail(End, Level)
+SMSCL::SMSCL(u8 End, u8 Level): SCSerial(End, Level)
 {
 }
 
@@ -48,15 +48,15 @@ int SMSCL::writePos(u8 ID, s16 Position, u16 Time, u16 Speed, u8 Fun)
 	return Ack(ID);
 }
 
-//Ð´Î»ÖÃÖ¸Áî
-//¶æ»úID£¬PositionÎ»ÖÃ£¬Ö´ÐÐÊ±¼äTime£¬Ö´ÐÐËÙ¶ÈSpeed
+//Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+//ï¿½ï¿½ï¿½IDï¿½ï¿½PositionÎ»ï¿½Ã£ï¿½Ö´ï¿½ï¿½Ê±ï¿½ï¿½Timeï¿½ï¿½Ö´ï¿½ï¿½ï¿½Ù¶ï¿½Speed
 int SMSCL::WritePos(u8 ID, s16 Position, u16 Time, u16 Speed)
 {
 	return writePos(ID, Position, Time, Speed, INST_WRITE);
 }
 
-//Òì²½Ð´Î»ÖÃÖ¸Áî
-//¶æ»úID£¬PositionÎ»ÖÃ£¬Ö´ÐÐÊ±¼äTime£¬Ö´ÐÐËÙ¶ÈSpeed
+//ï¿½ì²½Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+//ï¿½ï¿½ï¿½IDï¿½ï¿½PositionÎ»ï¿½Ã£ï¿½Ö´ï¿½ï¿½Ê±ï¿½ï¿½Timeï¿½ï¿½Ö´ï¿½ï¿½ï¿½Ù¶ï¿½Speed
 int SMSCL::RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed)
 {
 	return writePos(ID, Position, Time, Speed, INST_REG_WRITE);
@@ -67,8 +67,8 @@ void SMSCL::RegWriteAction()
 	writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
 }
 
-//Ð´Î»ÖÃÖ¸Áî
-//¶æ»úID[]Êý×é£¬IDNÊý×é³¤¶È£¬PositionÎ»ÖÃ£¬Ö´ÐÐÊ±¼äTime£¬Ö´ÐÐËÙ¶ÈSpeed
+//Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+//ï¿½ï¿½ï¿½ID[]ï¿½ï¿½ï¿½é£¬IDNï¿½ï¿½ï¿½é³¤ï¿½È£ï¿½PositionÎ»ï¿½Ã£ï¿½Ö´ï¿½ï¿½Ê±ï¿½ï¿½Timeï¿½ï¿½Ö´ï¿½ï¿½ï¿½Ù¶ï¿½Speed
 void SMSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed)
 {
 	if(Position<0){
@@ -79,10 +79,10 @@ void SMSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed)
 	Host2SCS(buf+0, buf+1, Position);
 	Host2SCS(buf+2, buf+3, Time);
 	Host2SCS(buf+4, buf+5, Speed);
-	snycWrite(ID, IDN, SMSCL_GOAL_POSITION_L, buf, 6);
+	syncWrite(ID, IDN, SMSCL_GOAL_POSITION_L, buf, 6);
 }
 
-//¶ÁÎ»ÖÃ£¬³¬Ê±·µ»ØErr=1
+//ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Err=1
 s16 SMSCL::ReadPos(u8 ID, u8 *Err)
 {
 	s16 curPos = readWord(ID, SMSCL_PRESENT_POSITION_L);
@@ -102,7 +102,7 @@ s16 SMSCL::ReadPos(u8 ID, u8 *Err)
 	return curPos;
 }
 
-//ºãËÙ¿ØÖÆÖ¸Áî
+//ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
 int SMSCL::WriteSpe(u8 ID, s16 Speed, u8 ACC)
 {
 	if(Speed<0){
@@ -112,7 +112,7 @@ int SMSCL::WriteSpe(u8 ID, s16 Speed, u8 ACC)
 	return writeWord(ID, SMSCL_GOAL_TIME_L, Speed);
 }
 
-//PWMÊä³öÄ£Ê½
+//PWMï¿½ï¿½ï¿½Ä£Ê½
 int SMSCL::WritePWM(u8 ID, s16 pwmOut)
 {
 	if(pwmOut<0){
@@ -122,19 +122,19 @@ int SMSCL::WritePWM(u8 ID, s16 pwmOut)
 	return writeWord(ID, SMSCL_GOAL_SPEED_L, pwmOut);
 }
 
-//¶ÁÊä³öÅ¤Á¦£¬³¬Ê±·µ»Ø-1
+//ï¿½ï¿½ï¿½ï¿½ï¿½Å¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½-1
 int SMSCL::ReadLoad(u8 ID)
 {	
 	return readWord(ID, SMSCL_PRESENT_LOAD_L);
 }
 
-//¶ÁµçÑ¹£¬³¬Ê±·µ»Ø-1
+//ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½-1
 int SMSCL::ReadVoltage(u8 ID)
 {	
 	return readByte(ID, SMSCL_PRESENT_VOLTAGE);
 }
 
-//¶ÁÎÂ¶È£¬³¬Ê±·µ»Ø-1
+//ï¿½ï¿½ï¿½Â¶È£ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½-1
 int SMSCL::ReadTemper(u8 ID)
 {	
 	return readByte(ID, SMSCL_PRESENT_TEMPERATURE);
@@ -155,7 +155,7 @@ int SMSCL::joinMode(u8 ID, u16 minAngle, u16 maxAngle)
 	return writeByte(ID, SMSCL_MODE, 0);
 }
 
-//»Ö¸´¶æ»ú²ÎÊýÎªÄ¬ÈÏÖµ
+//ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÄ¬ï¿½ï¿½Öµ
 int SMSCL::Recovery(u8 ID)
 {
 	flushSCS();
@@ -163,7 +163,7 @@ int SMSCL::Recovery(u8 ID)
 	return Ack(ID);
 }
 
-//¸´Î»¶æ»ú
+//ï¿½ï¿½Î»ï¿½ï¿½ï¿½
 int SMSCL::Reset(u8 ID)
 {
 	flushSCS();
@@ -183,12 +183,12 @@ int SMSCL::WriteOfs(u8 ID, s16 Ofs)
 
 int SMSCL::unLockEprom(u8 ID)
 {
-	return writeByte(ID, SMSCL_LOCK, 0);//´ò¿ªEPROM±£´æ¹¦ÄÜ
+	return writeByte(ID, SMSCL_LOCK, 0);//ï¿½ï¿½EPROMï¿½ï¿½ï¿½æ¹¦ï¿½ï¿½
 }
 
 int SMSCL::LockEprom(u8 ID)
 {
-	return writeByte(ID, SMSCL_LOCK, 1);//¹Ø±ÕEPROM±£´æ¹¦ÄÜ
+	return writeByte(ID, SMSCL_LOCK, 1);//ï¿½Ø±ï¿½EPROMï¿½ï¿½ï¿½æ¹¦ï¿½ï¿½
 }
 
 int SMSCL::WritePunch(u8 ID, u16 new_punch)

@@ -1,8 +1,8 @@
 /*
  * SMSCL.h
- * ·ÉÌØSMSCLÏµÁÐ´®ÐÐ¶æ»ú½Ó¿Ú
- * ÈÕÆÚ: 2018.8.2
- * ×÷Õß: Ì·ÐÛÀÖ
+ * ï¿½ï¿½ï¿½ï¿½SMSCLÏµï¿½Ð´ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ó¿ï¿½
+ * ï¿½ï¿½ï¿½ï¿½: 2018.8.2
+ * ï¿½ï¿½ï¿½ï¿½: Ì·ï¿½ï¿½ï¿½ï¿½
  */
 
 #ifndef _SMSCL_H
@@ -18,12 +18,12 @@
 #define		SMSCL_57600			6
 #define		SMSCL_38400			7
 
-//ÄÚ´æ±í¶¨Òå
-//-------EPROM(Ö»¶Á)--------
+//ï¿½Ú´ï¿½ï¿½ï¿½ï¿½
+//-------EPROM(Ö»ï¿½ï¿½)--------
 #define SMSCL_VERSION_L 3
 #define SMSCL_VERSION_H 4
 
-//-------EPROM(¶ÁÐ´)--------
+//-------EPROM(ï¿½ï¿½Ð´)--------
 #define SMSCL_ID 5
 #define SMSCL_BAUD_RATE 6
 #define SMSCL_RETURN_DELAY_TIME 7
@@ -52,7 +52,7 @@
 #define SMSCL_MAX_CURRENT_L 36
 #define SMSCL_MAX_CURRENT_H 37	
 
-//-------SRAM(¶ÁÐ´)--------
+//-------SRAM(ï¿½ï¿½Ð´)--------
 #define SMSCL_TORQUE_ENABLE 40
 #define SMSCL_GOAL_POSITION_L 42
 #define SMSCL_GOAL_POSITION_H 43
@@ -62,7 +62,7 @@
 #define SMSCL_GOAL_SPEED_H 47
 #define SMSCL_LOCK 48
 
-//-------SRAM(Ö»¶Á)--------
+//-------SRAM(Ö»ï¿½ï¿½)--------
 #define SMSCL_PRESENT_POSITION_L 56
 #define SMSCL_PRESENT_POSITION_H 57
 #define SMSCL_PRESENT_SPEED_L 58
@@ -76,33 +76,33 @@
 #define SMSCL_PRESENT_CURRENT_L 69
 #define SMSCL_PRESENT_CURRENT_H 70
 
-#include "SCSerail.h"
+#include "SCSerial.h"
 
-class SMSCL : public SCSerail
+class SMSCL : public SCSerial
 {
 public:
 	SMSCL();
 	SMSCL(u8 End);
 	SMSCL(u8 End, u8 Level);
 	
-	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//ÆÕÍ¨Ð´Î»ÖÃÖ¸Áî
-	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//Òì²½Ð´Î»ÖÃÖ¸Áî
-	virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed = 0);//Í¬²½Ð´Î»ÖÃÖ¸Áî
-	virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//ºãËÙÄ£Ê½¿ØÖÆÖ¸Áî
-	virtual int pwmMode(u8 ID);//PWMÊä³öÄ£Ê½
-	virtual int wheelMode(u8 ID);//ºãËÙÄ£Ê½
-	virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//ÆÕÍ¨ËÅ·þÄ£Ê½	
-	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//¶ÁÎ»ÖÃ , Err not used
-	virtual int Recovery(u8 ID);//»Ö¸´¶æ»ú²ÎÊýÎªÄ¬ÈÏÖµ
-	virtual int Reset(u8 ID);//¸´Î»¶æ»ú
-	virtual int unLockEprom(u8 ID);//eprom½âËø
-	virtual int LockEprom(u8 ID);//eprom¼ÓËø
-	virtual int WritePWM(u8 ID, s16 pwmOut);//PWMÊä³öÄ£Ê½Ö¸Áî
-	virtual int EnableTorque(u8 ID, u8 Enable);//Å¤Á¦¿ØÖÆÖ¸Áî
-	virtual void RegWriteAction();//Ö´ÐÐÒì²½Ð´Ö¸Áî
-	virtual int ReadLoad(u8 ID);//¶ÁÊä³öÅ¤Á¦
-	virtual int ReadVoltage(u8 ID);//¶ÁµçÑ¹
-	virtual int ReadTemper(u8 ID);//¶ÁÎÂ¶È
+	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//ï¿½ï¿½Í¨Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//ï¿½ì²½Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+	virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed = 0);//Í¬ï¿½ï¿½Ð´Î»ï¿½ï¿½Ö¸ï¿½ï¿½
+	virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+	virtual int pwmMode(u8 ID);//PWMï¿½ï¿½ï¿½Ä£Ê½
+	virtual int wheelMode(u8 ID);//ï¿½ï¿½ï¿½ï¿½Ä£Ê½
+	virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//ï¿½ï¿½Í¨ï¿½Å·ï¿½Ä£Ê½	
+	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//ï¿½ï¿½Î»ï¿½ï¿½ , Err not used
+	virtual int Recovery(u8 ID);//ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÄ¬ï¿½ï¿½Öµ
+	virtual int Reset(u8 ID);//ï¿½ï¿½Î»ï¿½ï¿½ï¿½
+	virtual int unLockEprom(u8 ID);//epromï¿½ï¿½ï¿½ï¿½
+	virtual int LockEprom(u8 ID);//epromï¿½ï¿½ï¿½ï¿½
+	virtual int WritePWM(u8 ID, s16 pwmOut);//PWMï¿½ï¿½ï¿½Ä£Ê½Ö¸ï¿½ï¿½
+	virtual int EnableTorque(u8 ID, u8 Enable);//Å¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+	virtual void RegWriteAction();//Ö´ï¿½ï¿½ï¿½ì²½Ð´Ö¸ï¿½ï¿½
+	virtual int ReadLoad(u8 ID);//ï¿½ï¿½ï¿½ï¿½ï¿½Å¤ï¿½ï¿½
+	virtual int ReadVoltage(u8 ID);//ï¿½ï¿½ï¿½ï¿½Ñ¹
+	virtual int ReadTemper(u8 ID);//ï¿½ï¿½ï¿½Â¶ï¿½
 	virtual int ReadSpeed(u8 ID, u8 *Err = NULL);
 	virtual int ReadCurrent(u8 ID, u8 *Err = NULL);
 	virtual int ReadMove(u8 ID);
@@ -113,7 +113,7 @@ public:
 	virtual int WriteI(u8 ID, u8 new_I);
 	virtual int WriteD(u8 ID, u8 new_D);
 	virtual int WriteMaxTorque(u8 ID, u16 new_torque);
-	virtual int WriteOfs(u8 ID, s16 Ofs);//ÖÐÎ»Ð£×¼
+	virtual int WriteOfs(u8 ID, s16 Ofs);//ï¿½ï¿½Î»Ð£×¼
 	virtual int ReadPunch(u8 ID);
 	virtual int ReadP(u8 ID);
 	virtual int ReadI(u8 ID);

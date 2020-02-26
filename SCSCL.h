@@ -76,9 +76,9 @@
 #define SCSCL_PRESENT_CURRENT_L 69
 #define SCSCL_PRESENT_CURRENT_H 70
 
-#include "SCSerail.h"
+#include "SCSerial.h"
 
-class SCSCL : public SCSerail
+class SCSCL : public SCSerial
 {
 public:
 	SCSCL();

@@ -12,11 +12,11 @@ SCSCL::SCSCL()
 	End = 1;
 }
 
-SCSCL::SCSCL(u8 End):SCSerail(End)
+SCSCL::SCSCL(u8 End): SCSerial(End)
 {
 }
 
-SCSCL::SCSCL(u8 End, u8 Level):SCSerail(End, Level)
+SCSCL::SCSCL(u8 End, u8 Level): SCSerial(End, Level)
 {
 }
 
@@ -70,7 +70,7 @@ void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed)
 	Host2SCS(buf+0, buf+1, Position);
 	Host2SCS(buf+2, buf+3, Time);
 	Host2SCS(buf+4, buf+5, Speed);
-	snycWrite(ID, IDN, SCSCL_GOAL_POSITION_L, buf, 6);
+	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, buf, 6);
 }
 
 void SCSCL::SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed)
@@ -86,7 +86,7 @@ void SCSCL::SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed)
         memcpy(offbuf[i], buf, 6);
         //writeSCS(offbuf[i], 6);
     }
-    snycWrite(ID, IDN, SCSCL_GOAL_POSITION_L, (u8*)offbuf, 6);
+	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, (u8 *) offbuf, 6);
 }
 
 //读位置，超时返回-1

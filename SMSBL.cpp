@@ -13,11 +13,11 @@ SMSBL::SMSBL()
 	End = 0;
 }
 
-SMSBL::SMSBL(u8 End):SCSerail(End)
+SMSBL::SMSBL(u8 End): SCSerial(End)
 {
 }
 
-SMSBL::SMSBL(u8 End, u8 Level):SCSerail(End, Level)
+SMSBL::SMSBL(u8 End, u8 Level): SCSerial(End, Level)
 {
 }
 
@@ -81,7 +81,7 @@ void SMSBL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position, u16 Speed, u8 ACC)
 	Host2SCS(buf+1, buf+2, Position);
 	Host2SCS(buf+3, buf+4, 0);
 	Host2SCS(buf+5, buf+6, Speed);
-	snycWrite(ID, IDN, SMSBL_ACC, buf, 7);
+	syncWrite(ID, IDN, SMSBL_ACC, buf, 7);
 }
 
 //读位置，超时Err=1

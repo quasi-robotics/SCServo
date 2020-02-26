@@ -17,7 +17,7 @@ public:
 	SCS(u8 End, u8 Level);
 	int genWrite(u8 ID, u8 MemAddr, u8 *nDat, u8 nLen);//普通写指令
 	int regWrite(u8 ID, u8 MemAddr,u8 *nDat, u8 nLen);//异步写指令
-	void snycWrite(u8 ID[], u8 IDN, u8 MemAddr, u8 *nDat, u8 nLen);//同步写指令
+	void syncWrite(u8 *ID, u8 IDN, u8 MemAddr, u8 *nDat, u8 nLen);//同步写指令
 	int writeByte(u8 ID, u8 MemAddr, u8 bDat);//写1个字节
 	int writeWord(u8 ID, u8 MemAddr, u16 wDat);//写2个字节
 	int Read(u8 ID, u8 MemAddr, u8 *nData, u8 nLen);//读指令
