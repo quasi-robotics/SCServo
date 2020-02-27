@@ -81,9 +81,9 @@
 class SCSCL : public SCSerial
 {
 public:
-	SCSCL();
-	SCSCL(u8 End);
-	SCSCL(u8 End, u8 Level);
+	SCSCL(SerialIO* pSerial);
+	SCSCL(SerialIO* pSerial, u8 End);
+	SCSCL(SerialIO* pSerial, u8 End, u8 Level);
 	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//普通写位置指令
 	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//异步写位置指令
 	virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed = 0);//同步写位置指令(所有舵机位置为Position)

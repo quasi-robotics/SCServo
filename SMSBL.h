@@ -85,9 +85,9 @@
 class SMSBL : public SCSerial
 {
 public:
-	SMSBL();
-	SMSBL(u8 End);
-	SMSBL(u8 End, u8 Level);
+	SMSBL(SerialIO* pSerial);
+	SMSBL(SerialIO* pSerial, u8 End);
+	SMSBL(SerialIO* pSerial, u8 End, u8 Level);
 	
 	virtual int WritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC = 0);//普通写位置指令
 	virtual int RegWritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC = 0);//异步写位置指令

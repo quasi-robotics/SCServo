@@ -81,9 +81,9 @@
 class SMSCL : public SCSerial
 {
 public:
-	SMSCL();
-	SMSCL(u8 End);
-	SMSCL(u8 End, u8 Level);
+	SMSCL(SerialIO* pSerial);
+	SMSCL(SerialIO* pSerial, u8 End);
+	SMSCL(SerialIO* pSerial, u8 End, u8 Level);
 	
 	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//��ͨдλ��ָ��
 	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//�첽дλ��ָ��

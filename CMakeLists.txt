@@ -8,4 +8,5 @@ file(GLOB hdrs *.h)
 file(GLOB srs *.cpp)
 
 add_library(${project} STATIC ${hdrs} ${srs})
-#add_executable(${project} main.cpp ${hdrs} ${srs})
+#add_executable(${project}_test test.cpp)
+#target_link_libraries(${project}_test ${project})

@@ -9,16 +9,15 @@
 
 #include "SCServo.h"
 
-SMSCL::SMSCL()
-{
-	End = 0;
-}
-
-SMSCL::SMSCL(u8 End): SCSerial(End)
+SMSCL::SMSCL(SerialIO* pSerial) : SCSerial(pSerial)
 {
 }
 
-SMSCL::SMSCL(u8 End, u8 Level): SCSerial(End, Level)
+SMSCL::SMSCL(SerialIO* pSerial, u8 End): SCSerial(pSerial, End)
+{
+}
+
+SMSCL::SMSCL(SerialIO* pSerial, u8 End, u8 Level): SCSerial(pSerial, End, Level)
 {
 }
 

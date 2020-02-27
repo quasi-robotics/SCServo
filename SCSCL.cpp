@@ -7,16 +7,16 @@
 
 #include "SCServo.h"
 
-SCSCL::SCSCL()
+SCSCL::SCSCL(SerialIO* pSerial) : SCSerial(pSerial)
 {
 	End = 1;
 }
 
-SCSCL::SCSCL(u8 End): SCSerial(End)
+SCSCL::SCSCL(SerialIO* pSerial, u8 End): SCSerial(pSerial, End)
 {
 }
 
-SCSCL::SCSCL(u8 End, u8 Level): SCSerial(End, Level)
+SCSCL::SCSCL(SerialIO* pSerial, u8 End, u8 Level): SCSerial(pSerial, End, Level)
 {
 }
 
@@ -75,17 +75,12 @@ void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed)
 
 void SCSCL::SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed)
 {
-    //u8* offbuf[IDN];
-    u8 offbuf[IDN][6];
-    for(u8 i = 0; i<IDN; i++){
-        u8 buf[6];
-        Host2SCS(buf+0, buf+1, Position[i]);
-        Host2SCS(buf+2, buf+3, Time);
-        Host2SCS(buf+4, buf+5, Speed);
-        //offbuf[i] = buf;
-        memcpy(offbuf[i], buf, 6);
-        //writeSCS(offbuf[i], 6);
-    }
+  u8 offbuf[6*IDN];
+  for(u8 i = 0; i<IDN; i++){
+    Host2SCS(offbuf+i*6+0, offbuf+i*6+1, Position[i]);
+    Host2SCS(offbuf+i*6+2, offbuf+i*6+3, Time);
+    Host2SCS(offbuf+i*6+4, offbuf+i*6+5, Speed);
+  }
 	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, (u8 *) offbuf, 6);
 }
 

@@ -8,16 +8,15 @@
 
 #include "SMSBL.h"
 
-SMSBL::SMSBL()
-{
-	End = 0;
-}
-
-SMSBL::SMSBL(u8 End): SCSerial(End)
+SMSBL::SMSBL(SerialIO* pSerial) : SCSerial(pSerial)
 {
 }
 
-SMSBL::SMSBL(u8 End, u8 Level): SCSerial(End, Level)
+SMSBL::SMSBL(SerialIO* pSerial, u8 End): SCSerial(pSerial, End)
+{
+}
+
+SMSBL::SMSBL(SerialIO* pSerial, u8 End, u8 Level): SCSerial(pSerial, End, Level)
 {
 }
 
