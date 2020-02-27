@@ -5,8 +5,12 @@
  * 作者: 谭雄乐
  */
 
-
 #include "SCSerial.h"
+
+#if !defined(ARDUINO)
+#include <fcntl.h>
+#include <sys/select.h>
+#endif
 
 SCSerial::SCSerial(SerialIO* pSerial)
 {
@@ -98,7 +102,7 @@ bool LinuxSerial::begin(int baudRate, const char* serialPort)
     perror("open:");
     return false;
   }
-  fcntl(fd, F_SETFL, FNDELAY);
+  fcntl(fd, F_SETFL, _FNDELAY);
 
   return setBaudRate(baudRate);
 }
