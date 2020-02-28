@@ -84,10 +84,13 @@ public:
 	SCSCL(SerialIO* pSerial);
 	SCSCL(SerialIO* pSerial, u8 End);
 	SCSCL(SerialIO* pSerial, u8 End, u8 Level);
-	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//普通写位置指令
-	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//异步写位置指令
-	virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed = 0);//同步写位置指令(所有舵机位置为Position)
-	virtual void SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed = 0);//同步写位置指令(每个舵机位置通过Position[]指令)
+
+  virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0);
+  virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+
+  virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+  virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
+
 	virtual int pwmMode(u8 ID);//PWM输出模式
 	virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式	
 	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//读位置 , Err not used

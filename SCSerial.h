@@ -42,11 +42,11 @@ protected:
     virtual void flushSCS() { return pSerial->flush(); }
 
       // functions
-    virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0)      {  return  0  ; }
-    virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0) {  return  0  ; }
+    virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0) = 0;
+    virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0) = 0;
 
-    virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0)     {  return     ; }
-    virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr)     {  return     ; }
+    virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0) = 0;
+    virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr) = 0;
 
     virtual int WriteOfs(u8 ID, s16 Ofs)                                                  {  return  0  ; }
     virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0)                                    {  return  0  ; }

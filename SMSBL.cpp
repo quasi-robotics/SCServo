@@ -32,7 +32,7 @@ int SMSBL::ReadTorqueEnable(u8 ID)
 }
 
 
-int SMSBL::writePos(u8 ID, s16 Position, u16 Speed, u8 ACC, u8 Fun)
+int SMSBL::writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun)
 {
 	if(Position<0){
 		Position = -Position;
@@ -42,7 +42,7 @@ int SMSBL::writePos(u8 ID, s16 Position, u16 Speed, u8 ACC, u8 Fun)
 	u8 buf[7];
 	buf[0] = ACC;
 	Host2SCS(buf+1, buf+2, Position);
-	Host2SCS(buf+3, buf+4, 0);
+	Host2SCS(buf+3, buf+4, Time);
 	Host2SCS(buf+5, buf+6, Speed);
 	writeBuf(ID, SMSBL_ACC, buf, 7, Fun);
 	return Ack(ID);
@@ -50,16 +50,16 @@ int SMSBL::writePos(u8 ID, s16 Position, u16 Speed, u8 ACC, u8 Fun)
 
 //写位置指令
 //舵机ID，Position位置，加速度ACC，速度Speed
-int SMSBL::WritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC)
+int SMSBL::WritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
-	return writePos(ID, Position, Speed, ACC, INST_WRITE);
+	return writePos(ID, Position, Speed, Time, ACC, INST_WRITE);
 }
 
 //异步写位置指令
 //舵机ID，Position位置，加速度ACC，速度Speed
-int SMSBL::RegWritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC)
+int SMSBL::RegWritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
-	return writePos(ID, Position, Speed, ACC, INST_REG_WRITE);
+	return writePos(ID, Position, Speed, Time, ACC, INST_REG_WRITE);
 }
 
 void SMSBL::RegWriteAction()
@@ -69,18 +69,39 @@ void SMSBL::RegWriteAction()
 
 //写位置指令
 //舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
-void SMSBL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position, u16 Speed, u8 ACC)
+void SMSBL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
-	if(Position<0){
-		Position = -Position;
-		Position |= (1<<15);
-	}
-	u8 buf[7];
-	buf[0] = ACC;
-	Host2SCS(buf+1, buf+2, Position);
-	Host2SCS(buf+3, buf+4, 0);
-	Host2SCS(buf+5, buf+6, Speed);
-	syncWrite(ID, IDN, SMSBL_ACC, buf, 7);
+  u8 offbuf[7*IDN];
+  for(u8 i = 0; i<IDN; i++) {
+    if(Position[i]<0){
+      Position[i] = -Position[i];
+      Position[i] |= (1<<15);
+    }
+    offbuf[i*7] = ACC;
+    Host2SCS(offbuf+i*7+1, offbuf+i*7+2, Position[i]);
+    Host2SCS(offbuf+i*7+3, offbuf+i*7+4, Time);
+    Host2SCS(offbuf+i*7+5, offbuf+i*7+6, Speed);
+  }
+  syncWrite(ID, IDN, SMSBL_ACC, offbuf, 7);
+}
+
+//写位置指令
+//舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
+void SMSBL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Time[], u8 ACC[])
+{
+  u8 offbuf[7*IDN];
+  for(u8 i = 0; i<IDN; i++){
+    if(Position[i]<0){
+      Position[i] = -Position[i];
+      Position[i] |= (1<<15);
+    }
+
+    offbuf[i*7] = ACC ? ACC[i] : 0;
+    Host2SCS(offbuf+i*7+1, offbuf+i*7+2, Position[i]);
+    Host2SCS(offbuf+i*7+3, offbuf+i*7+4, Time ? Time[i] : 0);
+    Host2SCS(offbuf+i*7+5, offbuf+i*7+6, Speed ? Speed[i] : 0);
+  }
+  syncWrite(ID, IDN, SMSBL_ACC, offbuf, 7);
 }
 
 //读位置，超时Err=1

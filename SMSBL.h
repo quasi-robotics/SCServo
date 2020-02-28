@@ -88,10 +88,13 @@ public:
 	SMSBL(SerialIO* pSerial);
 	SMSBL(SerialIO* pSerial, u8 End);
 	SMSBL(SerialIO* pSerial, u8 End, u8 Level);
-	
-	virtual int WritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC = 0);//普通写位置指令
-	virtual int RegWritePosEx(u8 ID, s16 Position, u16 Speed, u8 ACC = 0);//异步写位置指令
-	virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position, u16 Speed, u8 ACC = 0);//同步写位置指令	
+
+  virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0);
+  virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+
+  virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+  virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
+
 	virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//恒速模式控制指令
 	virtual int wheelMode(u8 ID);//恒速模式
 	virtual int pwmMode(u8 ID);//PWM输出模式
@@ -127,7 +130,7 @@ public:
 	virtual int ReadOfs(u8 ID, u8 *Err = NULL);
 
 private:
-	int writePos(u8 ID, s16 Position, u16 Speed, u8 ACC, u8 Fun);
+	int writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun);
 };
 
 #endif

@@ -45,14 +45,14 @@ int SCSCL::writePos(u8 ID, u16 Position, u16 Time, u16 Speed, u8 Fun)
 
 //写位置指令
 //舵机ID，Position位置，执行时间Time，执行速度Speed
-int SCSCL::WritePos(u8 ID, s16 Position, u16 Time, u16 Speed)
+int SCSCL::WritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
-	return writePos(ID, Position, Time, Speed, INST_WRITE);
+  return writePos(ID, Position, Time, Speed, INST_WRITE);
 }
 
 //异步写位置指令
 //舵机ID，Position位置，执行时间Time，执行速度Speed
-int SCSCL::RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed)
+int SCSCL::RegWritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
 	return writePos(ID, Position, Time, Speed, INST_REG_WRITE);
 }
@@ -62,18 +62,7 @@ void SCSCL::RegWriteAction()
 	writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
 }
 
-//写位置指令
-//舵机ID[]数组，IDN数组长度，Position位置，执行时间Time，执行速度Speed
-void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed)
-{
-	u8 buf[6];
-	Host2SCS(buf+0, buf+1, Position);
-	Host2SCS(buf+2, buf+3, Time);
-	Host2SCS(buf+4, buf+5, Speed);
-	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, buf, 6);
-}
-
-void SCSCL::SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed)
+void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
   u8 offbuf[6*IDN];
   for(u8 i = 0; i<IDN; i++){
@@ -81,7 +70,18 @@ void SCSCL::SyncWritePos2(u8 ID[], u8 IDN, u16 Position[], u16 Time, u16 Speed)
     Host2SCS(offbuf+i*6+2, offbuf+i*6+3, Time);
     Host2SCS(offbuf+i*6+4, offbuf+i*6+5, Speed);
   }
-	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, (u8 *) offbuf, 6);
+	syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, offbuf, 6);
+}
+
+void SCSCL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Time[], u8 ACC[])
+{
+  u8 offbuf[6*IDN];
+  for(u8 i = 0; i<IDN; i++){
+    Host2SCS(offbuf+i*6+0, offbuf+i*6+1, Position[i]);
+    Host2SCS(offbuf+i*6+2, offbuf+i*6+3, Time ? Time[i] : 0);
+    Host2SCS(offbuf+i*6+4, offbuf+i*6+5, Speed ? Speed[i] : 0);
+  }
+  syncWrite(ID, IDN, SCSCL_GOAL_POSITION_L, offbuf, 6);
 }
 
 //读位置，超时返回-1

@@ -102,7 +102,8 @@ bool LinuxSerial::begin(int baudRate, const char* serialPort)
     perror("open:");
     return false;
   }
-  fcntl(fd, F_SETFL, _FNDELAY);
+
+  fcntl(fd, F_SETFL, O_NONBLOCK);
 
   return setBaudRate(baudRate);
 }
