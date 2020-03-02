@@ -8,6 +8,7 @@
 #ifndef _SCS_H
 #define _SCS_H
 
+#include <stddef.h>
 #include "INST.h"
 
 class SCS{

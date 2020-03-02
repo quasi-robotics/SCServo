@@ -84,10 +84,13 @@ public:
 	SMSCL(SerialIO* pSerial);
 	SMSCL(SerialIO* pSerial, u8 End);
 	SMSCL(SerialIO* pSerial, u8 End, u8 Level);
-	
-	virtual int WritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//��ͨдλ��ָ��
-	virtual int RegWritePos(u8 ID, s16 Position, u16 Time, u16 Speed = 0);//�첽дλ��ָ��
-	virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position, u16 Time, u16 Speed = 0);//ͬ��дλ��ָ��
+
+  virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0);
+  virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+
+  virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+  virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
+
 	virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//����ģʽ����ָ��
 	virtual int pwmMode(u8 ID);//PWM���ģʽ
 	virtual int wheelMode(u8 ID);//����ģʽ
@@ -121,8 +124,9 @@ public:
 	virtual int ReadMaxTorque(u8 ID);
 	virtual int ReadTorqueEnable(u8 ID);
 	virtual int ReadOfs(u8 ID, u8 *Err = NULL); 
+
 private:
-	int writePos(u8 ID, s16 Position, u16 Time, u16 Speed, u8 Fun);
+  int writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun);
 };
 
 #endif
