@@ -12,10 +12,13 @@
   #include "Arduino.h"
 #else
   #include <stdio.h>
-  #include <termios.h>
   #include <fcntl.h>
-  #include <unistd.h>
   #include <string.h>
+
+  #if !defined(_MSC_VER)
+    #include <termios.h>
+    #include <unistd.h>
+  #endif
 #endif
 
 #include "SCS.h"
@@ -108,7 +111,7 @@ protected:
     unsigned long int IOTimeOut;//输入输出超时
 };
 
-#else
+#elif !defined(_MSC_VER)
 
 class LinuxSerial : public SerialIO {
 public:

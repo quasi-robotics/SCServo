@@ -5,6 +5,11 @@
  * 作者: 谭雄乐
  */
 
+#if defined(_MSC_VER)
+#include <malloc.h>
+#else
+#include <alloca.h>
+#endif
 #include "SCServo.h"
 
 SCSCL::SCSCL(SerialIO* pSerial) : SCSerial(pSerial)
@@ -64,7 +69,7 @@ void SCSCL::RegWriteAction()
 
 void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
-  u8 offbuf[6*IDN];
+  u8* offbuf = static_cast<u8 *>(alloca(6 * IDN));
   for(u8 i = 0; i<IDN; i++){
     Host2SCS(offbuf+i*6+0, offbuf+i*6+1, Position[i]);
     Host2SCS(offbuf+i*6+2, offbuf+i*6+3, Time);
@@ -75,7 +80,7 @@ void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u
 
 void SCSCL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Time[], u8 ACC[])
 {
-  u8 offbuf[6*IDN];
+  u8* offbuf = static_cast<u8 *>(alloca(6 * IDN));
   for(u8 i = 0; i<IDN; i++){
     Host2SCS(offbuf+i*6+0, offbuf+i*6+1, Position[i]);
     Host2SCS(offbuf+i*6+2, offbuf+i*6+3, Time ? Time[i] : 0);

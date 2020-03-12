@@ -7,7 +7,7 @@
 
 #include "SCSerial.h"
 
-#if !defined(ARDUINO)
+#if !defined(ARDUINO) && !defined(_MSC_VER)
 #include <fcntl.h>
 #include <sys/select.h>
 #endif
@@ -85,7 +85,7 @@ void ArduinoSerial::flush()
 {
   while(pSerial->read()!=-1);
 }
-#else
+#elif !defined(_MSC_VER)
 // LinuxSerial
 
 bool LinuxSerial::begin(int baudRate, const char* serialPort)

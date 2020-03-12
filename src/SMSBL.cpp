@@ -5,7 +5,11 @@
  * 作者: 谭雄乐
  */
 
-
+#if defined(_MSC_VER)
+#include <malloc.h>
+#else
+#include <alloca.h>
+#endif
 #include "SMSBL.h"
 
 SMSBL::SMSBL(SerialIO* pSerial) : SCSerial(pSerial)
@@ -71,7 +75,7 @@ void SMSBL::RegWriteAction()
 //舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
 void SMSBL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
-  u8 offbuf[7*IDN];
+  u8* offbuf = static_cast<u8 *>(alloca(7 * IDN));
   for(u8 i = 0; i<IDN; i++) {
     if(Position[i]<0){
       Position[i] = -Position[i];
@@ -89,7 +93,7 @@ void SMSBL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u
 //舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
 void SMSBL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Time[], u8 ACC[])
 {
-  u8 offbuf[7*IDN];
+  u8* offbuf = static_cast<u8 *>(alloca(7 * IDN));
   for(u8 i = 0; i<IDN; i++){
     if(Position[i]<0){
       Position[i] = -Position[i];
