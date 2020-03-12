@@ -6,7 +6,7 @@ project(${project})
 find_package(catkin REQUIRED COMPONENTS roscpp)
 
 catkin_package(
-        INCLUDE_DIRS ../include
+        INCLUDE_DIRS ../src
         CATKIN_DEPENDS roscpp
         LIBRARIES ${project}
 )
@@ -18,12 +18,11 @@ else()
 endif()
 
 include_directories(
-        ../include
         ${catkin_INCLUDE_DIRS}
 )
 file(GLOB srcs ../src/*.cpp)
 
-add_library(${project} ${hdrs} ${srcs})
+add_library(${project} ${srcs})
 
 install(TARGETS ${project}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -31,6 +30,7 @@ install(TARGETS ${project}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY ../include/
+install(DIRECTORY ../src/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        PATTERN "*.h"
 )
