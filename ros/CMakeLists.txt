@@ -32,5 +32,5 @@ install(TARGETS ${project}
 
 install(DIRECTORY ../src/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        PATTERN "*.h"
+        FILES_MATCHING PATTERN "*.h"
 )
