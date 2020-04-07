@@ -92,7 +92,7 @@ public:
   virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
 
 	virtual int pwmMode(u8 ID);//PWM输出模式
-	virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式	
+	virtual int jointMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式
 	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//读位置 , Err not used
 	virtual int Recovery(u8 ID);//复位舵机参数为默认值
 	virtual int Reset(u8 ID);//复位舵机

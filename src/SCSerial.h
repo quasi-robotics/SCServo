@@ -55,7 +55,7 @@ protected:
     virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0)                                    {  return  0  ; }
     virtual int wheelMode(u8 ID)                                                          {  return  0  ; }
     virtual int pwmMode(u8 ID)                                                            {  return  0  ; }
-    virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023)                    {  return  0  ; }
+    virtual int jointMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023)                    {  return  0  ; }
     virtual s16 ReadPos(u8 ID, u8 *Err = NULL)                                            {  return  0  ; }
     virtual int Recovery(u8 ID)															  {  return  0  ; }
     virtual int Reset(u8 ID)                                                              {  return  0  ; }

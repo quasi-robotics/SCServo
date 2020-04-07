@@ -145,7 +145,7 @@ int SCSCL::pwmMode(u8 ID)
 	return genWrite(ID, SCSCL_MIN_ANGLE_LIMIT_L, bBuf, 4);	
 }
 
-int SCSCL::joinMode(u8 ID, u16 minAngle, u16 maxAngle)
+int SCSCL::jointMode(u8 ID, u16 minAngle, u16 maxAngle)
 {
 	u8 bBuf[4];
 	Host2SCS(bBuf, bBuf+1, minAngle);

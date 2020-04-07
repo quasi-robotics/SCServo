@@ -24,7 +24,6 @@ SMSBL::SMSBL(SerialIO* pSerial, u8 End, u8 Level): SCSerial(pSerial, End, Level)
 {
 }
 
-
 int SMSBL::EnableTorque(u8 ID, u8 Enable)
 {
 	return writeByte(ID, SMSBL_TORQUE_ENABLE, Enable);
@@ -109,37 +108,18 @@ void SMSBL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Tim
 }
 
 //读位置，超时Err=1
-s16 SMSBL::ReadPos(u8 ID, u8 *Err)
+s16 SMSBL::ReadPos(u8 ID)
 {
-	/*s16 curPos = readWord(ID, SMSBL_PRESENT_POSITION_L);
-	if(curPos==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
-	}
-	if(curPos&(1<<15)){
-		curPos = -(curPos&~(1<<15));
-	}
-	if(Err){
-		*Err = 0;
-	}
-	
-	return curPos;*/
+    Err = 0;
 	s16 curPos = readWord(ID, SMSBL_PRESENT_POSITION_L);
 	if(curPos==-1){
-		if(Err){
-			*Err = 1;
-		}
+        Err = 1;
 		return -1;
 	}
-	if(Err){
-		if(curPos&(1<<15)){
-			curPos = -(curPos&~(1<<15));
-		}
-		*Err = 0;
-	}
-	
+    if(curPos&(1<<15)){
+        curPos = -(curPos&~(1<<15));
+    }
+
 	return curPos;
 }
 
@@ -168,37 +148,43 @@ int SMSBL::WriteSpe(u8 ID, s16 Speed, u8 ACC)
 }
 
 //读输出扭力，超时返回-1
-int SMSBL::ReadLoad(u8 ID, u8 *Err)
+int SMSBL::ReadLoad(u8 ID)
 {
-	//return readWord(ID, SMSBL_PRESENT_LOAD_L);
+    Err = 0;
 	int Load = readWord(ID, SMSBL_PRESENT_LOAD_L);
 	if(Load==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
+        Err = 1;
+        return -1;
 	}
-	if(Err){
-		if(Load&(1<<10)){
-			Load = -(Load&~(1<<10));
-		}
-		*Err = 0;
-	}
+    if(Load&(1<<10)){
+        Load = -(Load&~(1<<10));
+    }
 	return Load;
 }
 
 //读电压，超时返回-1
  int SMSBL::ReadVoltage(u8 ID)
-{	
-	return readByte(ID, SMSBL_PRESENT_VOLTAGE);
+{
+    Err = 0;
+    int Voltage = readByte(ID, SMSBL_PRESENT_VOLTAGE);
+    if(Voltage==-1){
+        Err = 1;
+        return -1;
+    }
+    return Voltage;
 }
 
 //读温度，超时返回-1
 int SMSBL::ReadTemper(u8 ID)
-{	
-	return readByte(ID, SMSBL_PRESENT_TEMPERATURE);
+{
+    Err = 0;
+	int Temper = readByte(ID, SMSBL_PRESENT_TEMPERATURE);
+    if(Temper==-1){
+        Err = 1;
+        return -1;
+    }
+    return Temper;
 }
-
 
 int SMSBL::wheelMode(u8 ID)
 {
@@ -210,7 +196,7 @@ int SMSBL::pwmMode(u8 ID)
 	return writeByte(ID, SMSBL_MODE, 2);		
 }
 
-int SMSBL::joinMode(u8 ID, u16 minAngle, u16 maxAngle) 
+int SMSBL::jointMode(u8 ID, u16 minAngle, u16 maxAngle)
 {
 	return writeByte(ID, SMSBL_MODE, 0);	
 }
@@ -275,86 +261,85 @@ int SMSBL::WriteMaxTorque(u8 ID, u16 new_torque)
 	return writeWord(ID, SMSBL_MAX_TORQUE_L, new_torque);	
 }
 
-int SMSBL::ReadOfs(u8 ID, u8 *Err)
+int SMSBL::ReadOfs(u8 ID)
 {
+    Err = 0;
 	s16 Ofs = readWord(ID, SMSBL_OFS_L);
 	if(Ofs==-1){
-		if(Err){
-			*Err = 1;
-		}
+        Err = 1;
 		return -1;
 	}
-	if(Err){
-		*Err = 0;
-		if(Ofs&(1<<15)){
-			Ofs = -(Ofs&~(1<<15));
-		}
-	}
+    if(Ofs&(1<<15)){
+        Ofs = -(Ofs&~(1<<15));
+    }
 	return Ofs;
 }
 
-int SMSBL::ReadSpeed(u8 ID, u8 *Err)
+int SMSBL::ReadSpeed(u8 ID)
 {
+    Err = 0;
 	s16 Speed = readWord(ID, SMSBL_PRESENT_SPEED_L);
 	if(Speed==-1){
-		if(Err){
-			*Err = 1;
-		}
+        Err = 1;
 		return -1;
 	}
-	if(Err){
-		*Err = 0;
-		if(Speed&(1<<15)){
-			Speed = -(Speed&~(1<<15));
-		}
-	}
+    if(Speed&(1<<15)){
+        Speed = -(Speed&~(1<<15));
+    }
 	return Speed;
 }
 
-int SMSBL::ReadCurrent(u8 ID, u8 *Err)
+int SMSBL::ReadCurrent(u8 ID)
 {
+    Err = 0;
 	s16 Current = readWord(ID, SMSBL_PRESENT_CURRENT_L);
 	if(Current==-1){
-		if(Err){
-			*Err = 1;
-		}
+	    Err = 1;
 		return -1;
 	}
-	if(Err){
-		*Err = 0;
-		if(Current&(1<<15)){
-			Current = -(Current&~(1<<15));
-		}
-	}
+    if(Current&(1<<15)){
+        Current = -(Current&~(1<<15));
+    }
 	return Current;
 }
 
 int SMSBL::ReadMove(u8 ID)
 {
-	return readByte(ID, SMSBL_MOVING);
+    Err = 0;
+	int Move = readByte(ID, SMSBL_MOVING);
+    if(Move==-1){
+        Err = 1;
+        return -1;
+    }
+	return Move;
 }
 
 int SMSBL::ReadPunch(u8 ID)
 {
+    Err = 0;
 	return readWord(ID, SMSBL_PUNCH_L);
 }
 
 int SMSBL::ReadP(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSBL_COMPLIANCE_P);
 }
 
 int SMSBL::ReadI(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSBL_COMPLIANCE_I);
 }
 
 int SMSBL::ReadD(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSBL_COMPLIANCE_D);
 }
 
 int SMSBL::ReadMaxTorque(u8 ID)
-{ 
+{
+    Err = 0;
 	return readWord(ID, SMSBL_MAX_TORQUE_L);
 }

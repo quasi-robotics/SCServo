@@ -37,29 +37,29 @@ int SMSCL::ReadTorqueEnable(u8 ID)
 
 int SMSCL::writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun)
 {
-  if(Position<0){
-    Position = -Position;
-    Position |= (1<<15);
-  }
-  flushSCS();
-  u8 buf[7];
-  buf[0] = ACC;
-  Host2SCS(buf+1, buf+2, Position);
-  Host2SCS(buf+3, buf+4, Time);
-  Host2SCS(buf+5, buf+6, Speed);
-  writeBuf(ID, SMSBL_ACC, buf, 7, Fun);
-  return Ack(ID);
+    if(Position<0){
+        Position = -Position;
+        Position |= (1<<15);
+    }
+    flushSCS();
+    u8 buf[7];
+    buf[0] = ACC;
+    Host2SCS(buf+1, buf+2, Position);
+    Host2SCS(buf+3, buf+4, Time);
+    Host2SCS(buf+5, buf+6, Speed);
+    writeBuf(ID, SMSCL_ACC, buf, 7, Fun);
+    return Ack(ID);
 }
 
-//дλ��ָ��
-//���ID��Positionλ�ã�ִ��ʱ��Time��ִ���ٶ�Speed
+//写位置指令
+//舵机ID，Position位置，加速度ACC，速度Speed
 int SMSCL::WritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
   return writePos(ID, Position, Speed, Time, ACC, INST_WRITE);
 }
 
-//�첽дλ��ָ��
-//���ID��Positionλ�ã�ִ��ʱ��Time��ִ���ٶ�Speed
+//异步写位置指令
+//舵机ID，Position位置，加速度ACC，速度Speed
 int SMSCL::RegWritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 {
   return writePos(ID, Position, Speed, Time, ACC, INST_REG_WRITE);
@@ -70,8 +70,8 @@ void SMSCL::RegWriteAction()
 	writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
 }
 
-//дλ��ָ��
-//���ID[]���飬IDN���鳤�ȣ�Positionλ�ã�ִ��ʱ��Time��ִ���ٶ�Speed
+//写位置指令
+//舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
 void SMSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
   u8* offbuf = static_cast<u8 *>(alloca(7 * IDN));
@@ -85,7 +85,7 @@ void SMSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u
     Host2SCS(offbuf+i*7+3, offbuf+i*7+4, Time);
     Host2SCS(offbuf+i*7+5, offbuf+i*7+6, Speed);
   }
-  syncWrite(ID, IDN, SMSBL_ACC, offbuf, 7);
+  syncWrite(ID, IDN, SMSCL_ACC, offbuf, 7);
 }
 
 //写位置指令
@@ -104,40 +104,40 @@ void SMSCL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Tim
     Host2SCS(offbuf+i*7+3, offbuf+i*7+4, Time ? Time[i] : 0);
     Host2SCS(offbuf+i*7+5, offbuf+i*7+6, Speed ? Speed[i] : 0);
   }
-  syncWrite(ID, IDN, SMSBL_ACC, offbuf, 7);
+  syncWrite(ID, IDN, SMSCL_ACC, offbuf, 7);
 }
 
-//��λ�ã���ʱ����Err=1
-s16 SMSCL::ReadPos(u8 ID, u8 *Err)
+//读位置，超时Err=1
+s16 SMSCL::ReadPos(u8 ID)
 {
-	s16 curPos = readWord(ID, SMSCL_PRESENT_POSITION_L);
-	if(curPos==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
-	}
-	if(curPos&(1<<15)){
-		curPos = -(curPos&~(1<<15));
-	}
-	if(Err){
-		*Err = 0;
-	}
-	
-	return curPos;
+    Err = 0;
+    s16 curPos = readWord(ID, SMSCL_PRESENT_POSITION_L);
+    if(curPos==-1){
+        Err = 1;
+        return -1;
+    }
+    if(curPos&(1<<15)){
+        curPos = -(curPos&~(1<<15));
+    }
+
+    return curPos;
 }
 
-//���ٿ���ָ��
+//速度控制模式
 int SMSCL::WriteSpe(u8 ID, s16 Speed, u8 ACC)
 {
 	if(Speed<0){
 		Speed = -Speed;
 		Speed |= (1<<15);
 	}
+    int res = writeByte(ID, SMSCL_ACC, ACC);
+    if(res==-1){
+        return -1;
+    }
 	return writeWord(ID, SMSCL_GOAL_TIME_L, Speed);
 }
 
-//PWM���ģʽ
+//PWM输出模式
 int SMSCL::WritePWM(u8 ID, s16 pwmOut)
 {
 	if(pwmOut<0){
@@ -147,22 +147,43 @@ int SMSCL::WritePWM(u8 ID, s16 pwmOut)
 	return writeWord(ID, SMSCL_GOAL_SPEED_L, pwmOut);
 }
 
-//�����Ť������ʱ����-1
+//读输出扭力，超时返回-1
 int SMSCL::ReadLoad(u8 ID)
 {	
-	return readWord(ID, SMSCL_PRESENT_LOAD_L);
+    Err = 0;
+    int Load = readWord(ID, SMSCL_PRESENT_LOAD_L);
+    if(Load==-1){
+        Err = 1;
+        return -1;
+    }
+    if(Load&(1<<10)){
+        Load = -(Load&~(1<<10));
+    }
+    return Load;
 }
 
-//����ѹ����ʱ����-1
+//读电压，超时返回-1
 int SMSCL::ReadVoltage(u8 ID)
-{	
-	return readByte(ID, SMSCL_PRESENT_VOLTAGE);
+{
+    Err = 0;
+    int Voltage = readByte(ID, SMSCL_PRESENT_VOLTAGE);
+    if(Voltage==-1){
+        Err = 1;
+        return -1;
+    }
+    return Voltage;
 }
 
-//���¶ȣ���ʱ����-1
+//读温度，超时返回-1
 int SMSCL::ReadTemper(u8 ID)
-{	
-	return readByte(ID, SMSCL_PRESENT_TEMPERATURE);
+{
+    Err = 0;
+    int Temper = readByte(ID, SMSCL_PRESENT_TEMPERATURE);
+    if(Temper==-1){
+        Err = 1;
+        return -1;
+    }
+    return Temper;
 }
 
 int SMSCL::wheelMode(u8 ID)
@@ -175,7 +196,7 @@ int SMSCL::pwmMode(u8 ID)
 	return writeByte(ID, SMSCL_MODE, 2);		
 }
 
-int SMSCL::joinMode(u8 ID, u16 minAngle, u16 maxAngle)
+int SMSCL::jointMode(u8 ID, u16 minAngle, u16 maxAngle)
 {
 	return writeByte(ID, SMSCL_MODE, 0);
 }
@@ -195,7 +216,6 @@ int SMSCL::Reset(u8 ID)
 	writeBuf(ID, 0, NULL, 0, INST_RESET);
 	return Ack(ID);
 }
-
 
 int SMSCL::WriteOfs(u8 ID, s16 Ofs)
 {
@@ -241,86 +261,85 @@ int SMSCL::WriteMaxTorque(u8 ID, u16 new_torque)
 	return writeWord(ID, SMSCL_MAX_TORQUE_L, new_torque);	
 }
 
-int SMSCL::ReadOfs(u8 ID, u8 *Err)
+int SMSCL::ReadOfs(u8 ID)
 {
-	s16 Ofs = readWord(ID, SMSCL_OFS_L);
-	if(Ofs==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
-	}
-	if(Err){
-		*Err = 0;
-		if(Ofs&(1<<15)){
-			Ofs = -(Ofs&~(1<<15));
-		}
-	}
-	return Ofs;
+    Err = 0;
+    s16 Ofs = readWord(ID, SMSCL_OFS_L);
+    if(Ofs==-1){
+        Err = 1;
+        return -1;
+    }
+    if(Ofs&(1<<15)){
+        Ofs = -(Ofs&~(1<<15));
+    }
+    return Ofs;
 }
 
-int SMSCL::ReadSpeed(u8 ID, u8 *Err)
+int SMSCL::ReadSpeed(u8 ID)
 {
-	s16 Speed = readWord(ID, SMSCL_PRESENT_SPEED_L);
-	if(Speed==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
-	}
-	if(Err){
-		*Err = 0;
-		if(Speed&(1<<15)){
-			Speed = -(Speed&~(1<<15));
-		}
-	}
-	return Speed;
+    Err = 0;
+    s16 Speed = readWord(ID, SMSCL_PRESENT_SPEED_L);
+    if(Speed==-1){
+        Err = 1;
+        return -1;
+    }
+    if(Speed&(1<<15)){
+        Speed = -(Speed&~(1<<15));
+    }
+    return Speed;
 }
 
-int SMSCL::ReadCurrent(u8 ID, u8 *Err)
+int SMSCL::ReadCurrent(u8 ID)
 {
-	s16 Current = readWord(ID, SMSCL_PRESENT_CURRENT_L);
-	if(Current==-1){
-		if(Err){
-			*Err = 1;
-		}
-		return -1;
-	}
-	if(Err){
-		*Err = 0;
-		if(Current&(1<<15)){
-			Current = -(Current&~(1<<15));
-		}
-	}
-	return Current;
+    Err = 0;
+    s16 Current = readWord(ID, SMSCL_PRESENT_CURRENT_L);
+    if(Current==-1){
+        Err = 1;
+        return -1;
+    }
+    if(Current&(1<<15)){
+        Current = -(Current&~(1<<15));
+    }
+    return Current;
 }
 
 int SMSCL::ReadMove(u8 ID)
 {
-	return readByte(ID, SMSCL_MOVING);
+    Err = 0;
+    int Move = readByte(ID, SMSCL_MOVING);
+    if(Move==-1){
+        Err = 1;
+        return -1;
+    }
+    return Move;
 }
 
 int SMSCL::ReadPunch(u8 ID)
 {
+    Err = 0;
 	return readWord(ID, SMSCL_PUNCH_L);
 }
 
 int SMSCL::ReadP(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSCL_COMPLIANCE_P);
 }
 
 int SMSCL::ReadI(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSCL_COMPLIANCE_I);
 }
 
 int SMSCL::ReadD(u8 ID)
 {
+    Err = 0;
 	return readByte(ID, SMSCL_COMPLIANCE_D);
 }
 
 int SMSCL::ReadMaxTorque(u8 ID)
-{ 
+{
+    Err = 0;
 	return readWord(ID, SMSCL_MAX_TORQUE_L);
 }

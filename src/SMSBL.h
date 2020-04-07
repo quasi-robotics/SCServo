@@ -39,8 +39,8 @@
 #define SMSBL_MIN_LIMIT_VOLTAGE 15
 #define SMSBL_MAX_TORQUE_L 16
 #define SMSBL_MAX_TORQUE_H 17
-#define SMSBL_ALARM_LED 19
-#define SMSBL_ALARM_SHUTDOWN 20
+#define SMSBL_ALARM_SHUTDOWN 19
+#define SMSBL_ALARM_LED 20
 #define SMSBL_COMPLIANCE_P 21
 #define SMSBL_COMPLIANCE_D 22
 #define SMSBL_COMPLIANCE_I 23
@@ -64,6 +64,8 @@
 #define SMSBL_GOAL_TIME_H 45
 #define SMSBL_GOAL_SPEED_L 46
 #define SMSBL_GOAL_SPEED_H 47
+#define SMSBL_TORQUE_LIMIT_L 48
+#define SMSBL_TORQUE_LIMIT_H 49
 #define SMSBL_LOCK 55
 
 //-------SRAM(只读)--------
@@ -85,52 +87,52 @@
 class SMSBL : public SCSerial
 {
 public:
-	SMSBL(SerialIO* pSerial);
-	SMSBL(SerialIO* pSerial, u8 End);
-	SMSBL(SerialIO* pSerial, u8 End, u8 Level);
+    SMSBL(SerialIO* pSerial);
+    SMSBL(SerialIO* pSerial, u8 End);
+    SMSBL(SerialIO* pSerial, u8 End, u8 Level);
 
-  virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0);
-  virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+    virtual int WritePos(u8 ID, s16 Position, u16 Speed=0, u16 Time = 0, u8 ACC = 0);
+    virtual int RegWritePos(u8 ID, s16 Position, u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
 
-  virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
-  virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
+    virtual void SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed = 0, u16 Time = 0, u8 ACC = 0);
+    virtual void SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[] = nullptr, u16 Time[] = nullptr, u8 ACC[] = nullptr);
 
-	virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//恒速模式控制指令
-	virtual int wheelMode(u8 ID);//恒速模式
-	virtual int pwmMode(u8 ID);//PWM输出模式
-	virtual int joinMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式, for smsbl, min-max angle not used
-	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//读位置
-	virtual int Recovery(u8 ID);//恢复舵机参数为默认值
-	virtual int Reset(u8 ID);//复位舵机
-	virtual int unLockEprom(u8 ID);//eprom解锁
-	virtual int LockEprom(u8 ID);//eprom加锁
-	virtual int WritePWM(u8 ID, s16 pwmOut);//PWM输出模式指令
-	virtual int EnableTorque(u8 ID, u8 Enable);//扭力控制指令
-	virtual void RegWriteAction();//执行异步写指令
-	virtual int ReadLoad(u8 ID, u8 *Err = NULL);//读输出扭力
-	virtual int ReadVoltage(u8 ID);//读电压
-	virtual int ReadTemper(u8 ID);//读温度
-	virtual int ReadSpeed(u8 ID, u8 *Err = NULL);
-	virtual int ReadCurrent(u8 ID, u8 *Err = NULL);
-	virtual int ReadMove(u8 ID);
+    virtual int WriteSpe(u8 ID, s16 Speed, u8 ACC = 0);//恒速模式控制指令
+    virtual int pwmMode(u8 ID);//PWM输出模式
+    virtual int wheelMode(u8 ID);//恒速模式
+    virtual int jointMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式, for smsbl, min-max angle not used
+    virtual s16 ReadPos(u8 ID);//读位置
+    virtual int Recovery(u8 ID);//恢复舵机参数为默认值
+    virtual int Reset(u8 ID);//复位舵机
+    virtual int unLockEprom(u8 ID);//eprom解锁
+    virtual int LockEprom(u8 ID);//eprom加锁
+    virtual int WritePWM(u8 ID, s16 pwmOut);//PWM输出模式指令
+    virtual int EnableTorque(u8 ID, u8 Enable);//扭力控制指令
+    virtual void RegWriteAction();//执行异步写指令
+    virtual int ReadLoad(u8 ID);//读输出扭力
+    virtual int ReadVoltage(u8 ID);//读电压
+    virtual int ReadTemper(u8 ID);//读温度
+    virtual int ReadSpeed(u8 ID);
+    virtual int ReadCurrent(u8 ID);
+    virtual int ReadMove(u8 ID);
 
-	// return -1 if fail, >=0 if ok
-	virtual int WritePunch(u8 ID,u16 new_punch);
-	virtual int WriteP(u8 ID, u8 new_P);
-	virtual int WriteI(u8 ID, u8 new_I);
-	virtual int WriteD(u8 ID, u8 new_D);
-	virtual int WriteMaxTorque(u8 ID, u16 new_torque);
-	virtual int WriteOfs(u8 ID, s16 Ofs);//中位校准
-	virtual int ReadPunch(u8 ID);
-	virtual int ReadP(u8 ID);
-	virtual int ReadI(u8 ID);
-	virtual int ReadD(u8 ID);
-	virtual int ReadMaxTorque(u8 ID);	
-	virtual int ReadTorqueEnable(u8 ID);
-	virtual int ReadOfs(u8 ID, u8 *Err = NULL);
+    // return -1 if fail, >=0 if ok
+    virtual int WritePunch(u8 ID,u16 new_punch);
+    virtual int WriteP(u8 ID, u8 new_P);
+    virtual int WriteI(u8 ID, u8 new_I);
+    virtual int WriteD(u8 ID, u8 new_D);
+    virtual int WriteMaxTorque(u8 ID, u16 new_torque);
+    virtual int WriteOfs(u8 ID, s16 Ofs);//中位校准
+    virtual int ReadPunch(u8 ID);
+    virtual int ReadP(u8 ID);
+    virtual int ReadI(u8 ID);
+    virtual int ReadD(u8 ID);
+    virtual int ReadMaxTorque(u8 ID);
+    virtual int ReadTorqueEnable(u8 ID);
+    virtual int ReadOfs(u8 ID);
 
 private:
-	int writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun);
+    int writePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC, u8 Fun);
 };
 
 #endif
