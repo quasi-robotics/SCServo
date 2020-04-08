@@ -30,6 +30,17 @@ SCSerial::SCSerial(SerialIO* pSerial, u8 End, u8 Level): SCS(End, Level)
 # if defined(ARDUINO)
 // ArduinoSerial
 
+bool WindowsSerial::begin(int baudrate, const char* port_name)
+{
+    pSerial->begin(baudrate);
+}
+
+bool WindowsSerial::setBaudRate(int baudrate)
+{
+    pSerial->end();
+    pSerial->begin(baudrate);
+}
+
 int ArduinoSerial::read(unsigned char *nDat, int nLen)
 {
   int Size = 0;
@@ -85,7 +96,126 @@ void ArduinoSerial::flush()
 {
   while(pSerial->read()!=-1);
 }
-#elif !defined(_MSC_VER)
+#elif defined(_MSC_VER)
+
+bool WindowsSerial::begin(int baudrate, const char* port_name)
+{
+    COMMTIMEOUTS timeouts;
+    DWORD dwError;
+
+    end();
+
+    char port_name_[15];
+    sprintf_s(port_name_, sizeof(port_name_), "\\\\.\\%s", port_name);
+
+    serial_handle_ = CreateFileA(port_name_, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (serial_handle_ == INVALID_HANDLE_VALUE)
+    {
+        return false;
+    }
+
+    if( !setBaudRate(baudrate) )
+        goto DXL_HAL_OPEN_ERROR;
+
+    if (SetCommMask(serial_handle_, 0) == FALSE) // Not using Comm event
+        goto DXL_HAL_OPEN_ERROR;
+    if (SetupComm(serial_handle_, 4096, 4096) == FALSE) // Buffer size (Rx,Tx)
+        goto DXL_HAL_OPEN_ERROR;
+    if (PurgeComm(serial_handle_, PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR) == FALSE) // Clear buffer
+        goto DXL_HAL_OPEN_ERROR;
+    if (ClearCommError(serial_handle_, &dwError, NULL) == FALSE)
+        goto DXL_HAL_OPEN_ERROR;
+
+    if (GetCommTimeouts(serial_handle_, &timeouts) == FALSE)
+        goto DXL_HAL_OPEN_ERROR;
+    // Timeout (Not using timeout)
+    // Immediatly return
+    timeouts.ReadIntervalTimeout = 0;
+    timeouts.ReadTotalTimeoutMultiplier = 0;
+    timeouts.ReadTotalTimeoutConstant = IOTimeOut; // must not be zero.
+    timeouts.WriteTotalTimeoutMultiplier = 0;
+    timeouts.WriteTotalTimeoutConstant = 0;
+    if (SetCommTimeouts(serial_handle_, &timeouts) == FALSE)
+        goto DXL_HAL_OPEN_ERROR;
+
+    //tx_time_per_byte_ = (1000.0 / (double)baudrate_) * 10.0;
+    return true;
+
+DXL_HAL_OPEN_ERROR:
+    end();
+    return false;
+}
+
+bool WindowsSerial::setBaudRate(int baudrate)
+{
+    DCB dcb;
+
+    dcb.DCBlength = sizeof(DCB);
+    if (GetCommState(serial_handle_, &dcb) == FALSE)
+        return false;
+
+    // Set baudrate
+    dcb.BaudRate = (DWORD)baudrate;
+    dcb.ByteSize = 8;                    // Data bit = 8bit
+    dcb.Parity = NOPARITY;             // No parity
+    dcb.StopBits = ONESTOPBIT;           // Stop bit = 1
+    dcb.fParity = NOPARITY;             // No Parity check
+    dcb.fBinary = 1;                    // Binary mode
+    dcb.fNull = 0;                    // Get Null byte
+    dcb.fAbortOnError = 0;
+    dcb.fErrorChar = 0;
+    // Not using XOn/XOff
+    dcb.fOutX = 0;
+    dcb.fInX = 0;
+    // Not using H/W flow control
+    dcb.fDtrControl = DTR_CONTROL_DISABLE;
+    dcb.fRtsControl = RTS_CONTROL_DISABLE;
+    dcb.fDsrSensitivity = 0;
+    dcb.fOutxDsrFlow = 0;
+    dcb.fOutxCtsFlow = 0;
+
+    return SetCommState(serial_handle_, &dcb);
+}
+
+void WindowsSerial::end()
+{
+    if (serial_handle_ != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(serial_handle_);
+        serial_handle_ = INVALID_HANDLE_VALUE;
+    }
+}
+
+int WindowsSerial::read(unsigned char *nDat, int nLen) {
+    DWORD dwRead = 0;
+
+    if (ReadFile(serial_handle_, nDat, (DWORD)nLen, &dwRead, NULL) == FALSE)
+        return -1;
+
+    return (int)dwRead;
+}
+
+int WindowsSerial::write(unsigned char *nDat, int nLen) {
+    DWORD dwWrite = 0;
+
+    if (WriteFile(serial_handle_, nDat, (DWORD)nLen, &dwWrite, NULL) == FALSE)
+        return -1;
+
+    return (int)dwWrite;
+}
+
+int WindowsSerial::write(unsigned char bDat) {
+    if (WriteFile(serial_handle_, &bDat, (DWORD)1, NULL, NULL) == FALSE)
+        return -1;
+
+    return 1;
+}
+
+void WindowsSerial::flush() {
+    PurgeComm(serial_handle_, PURGE_RXABORT | PURGE_RXCLEAR);
+}
+
+#else
 // LinuxSerial
 
 bool LinuxSerial::begin(int baudRate, const char* serialPort)
@@ -99,7 +229,7 @@ bool LinuxSerial::begin(int baudRate, const char* serialPort)
     return false;
   fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
   if(fd == -1){
-    perror("open:");
+    //perror("open:");
     return false;
   }
 
@@ -212,3 +342,13 @@ void LinuxSerial::flush() {
   tcflush(fd, TCIFLUSH);
 }
 #endif
+
+SerialIO *SerialIO::getSerialIO(unsigned long int IOTimeOut) {
+#if defined(__linux__)
+    return new LinuxSerial(IOTimeOut));
+//#elif defined(__APPLE__)
+//    return (PortHandler *)(new PortHandlerMac(port_name));
+#elif defined(_WIN32) || defined(_WIN64)
+    return new WindowsSerial(IOTimeOut);
+#endif
+}

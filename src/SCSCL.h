@@ -96,7 +96,7 @@ public:
 	virtual s16 ReadPos(u8 ID, u8 *Err = NULL);//读位置 , Err not used
 	virtual int Recovery(u8 ID);//复位舵机参数为默认值
 	virtual int Reset(u8 ID);//复位舵机
-	virtual int unLockEprom(u8 ID);//eprom解锁
+	virtual int UnLockEprom(u8 ID);//eprom解锁
 	virtual int LockEprom(u8 ID);//eprom加锁
 	virtual int WritePWM(u8 ID, s16 pwmOut);//PWM输出模式指令
 	virtual int EnableTorque(u8 ID, u8 Enable);//扭力控制指令

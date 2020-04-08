@@ -226,7 +226,7 @@ int SMSBL::WriteOfs(u8 ID, s16 Ofs)
 	return writeWord(ID, SMSBL_OFS_L, Ofs);
 }
 
-int SMSBL::unLockEprom(u8 ID)
+int SMSBL::UnLockEprom(u8 ID)
 {
 	return writeByte(ID, SMSBL_LOCK, 0);//打开EPROM保存功能
 }

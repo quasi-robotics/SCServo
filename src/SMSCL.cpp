@@ -111,7 +111,7 @@ void SMSCL::SyncWritePosEx(u8 ID[], u8 IDN, s16 Position[], u16 Speed[], u16 Tim
 s16 SMSCL::ReadPos(u8 ID)
 {
     Err = 0;
-    s16 curPos = readWord(ID, SMSCL_PRESENT_POSITION_L);
+    int curPos = readWord(ID, SMSCL_PRESENT_POSITION_L);
     if(curPos==-1){
         Err = 1;
         return -1;
@@ -226,7 +226,7 @@ int SMSCL::WriteOfs(u8 ID, s16 Ofs)
 	return writeWord(ID, SMSCL_OFS_L, Ofs);	
 }
 
-int SMSCL::unLockEprom(u8 ID)
+int SMSCL::UnLockEprom(u8 ID)
 {
 	return writeByte(ID, SMSCL_LOCK, 0);//��EPROM���湦��
 }

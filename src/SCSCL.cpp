@@ -169,7 +169,7 @@ int SCSCL::Reset(u8 ID)
 	return Ack(ID);
 }
 
-int SCSCL::unLockEprom(u8 ID)
+int SCSCL::UnLockEprom(u8 ID)
 {
 	return writeByte(ID, SCSCL_LOCK, 0);//打开EPROM保存功能
 }
