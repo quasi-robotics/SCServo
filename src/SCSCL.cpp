@@ -62,11 +62,6 @@ int SCSCL::RegWritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
 	return writePos(ID, Position, Time, Speed, INST_REG_WRITE);
 }
 
-void SCSCL::RegWriteAction()
-{
-	writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
-}
-
 void SCSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
 {
   u8* offbuf = static_cast<u8 *>(alloca(6 * IDN));
@@ -151,22 +146,6 @@ int SCSCL::jointMode(u8 ID, u16 minAngle, u16 maxAngle)
 	Host2SCS(bBuf, bBuf+1, minAngle);
 	Host2SCS(bBuf+2, bBuf+3, maxAngle);
 	return genWrite(ID, SCSCL_MIN_ANGLE_LIMIT_L, bBuf, 4);
-}
-
-//复位舵机参数为默认值
-int SCSCL::Recovery(u8 ID)
-{
-	flushSCS();
-	writeBuf(ID, 0, NULL, 0, INST_RECOVER);
-	return Ack(ID);
-}
-
-//复位舵机
-int SCSCL::Reset(u8 ID)
-{
-	flushSCS();
-	writeBuf(ID, 0, NULL, 0, INST_RESET);
-	return Ack(ID);
 }
 
 int SCSCL::UnLockEprom(u8 ID)

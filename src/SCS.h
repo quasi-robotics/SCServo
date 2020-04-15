@@ -26,6 +26,9 @@ public:
 	int readByte(u8 ID, u8 MemAddr);//读1个字节
 	int readWord(u8 ID, u8 MemAddr);//读2个字节
 	int Ping(u8 ID);//Ping指令
+    int Recovery(u8 ID);//复位舵机参数为默认值
+    int Reset(u8 ID);//复位舵机
+    void RegWriteAction();//执行异步写指令
 public:
 	u8	Level;//舵机返回等级
 	u8	End;//处理器大小端结构

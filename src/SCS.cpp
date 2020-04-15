@@ -260,3 +260,25 @@ int	SCS::Ping(u8 ID)
 	Error = bBuf[4];
 	return bBuf[2];
 }
+
+//复位舵机参数为默认值
+int SCS::Recovery(u8 ID)
+{
+    flushSCS();
+    writeBuf(ID, 0, NULL, 0, INST_RECOVER);
+    return Ack(ID);
+}
+
+//复位舵机
+int SCS::Reset(u8 ID)
+{
+    flushSCS();
+    writeBuf(ID, 0, NULL, 0, INST_RESET);
+    return Ack(ID);
+}
+
+void SCS::RegWriteAction()
+{
+    writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
+}
+

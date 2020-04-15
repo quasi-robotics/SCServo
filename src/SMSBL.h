@@ -102,13 +102,10 @@ public:
     virtual int wheelMode(u8 ID);//恒速模式
     virtual int jointMode(u8 ID, u16 minAngle = 0, u16 maxAngle = 1023);//普通伺服模式, for smsbl, min-max angle not used
     virtual s16 ReadPos(u8 ID);//读位置
-    virtual int Recovery(u8 ID);//恢复舵机参数为默认值
-    virtual int Reset(u8 ID);//复位舵机
     virtual int UnLockEprom(u8 ID);//eprom解锁
     virtual int LockEprom(u8 ID);//eprom加锁
     virtual int WritePWM(u8 ID, s16 pwmOut);//PWM输出模式指令
     virtual int EnableTorque(u8 ID, u8 Enable);//扭力控制指令
-    virtual void RegWriteAction();//执行异步写指令
     virtual int ReadLoad(u8 ID);//读输出扭力
     virtual int ReadVoltage(u8 ID);//读电压
     virtual int ReadTemper(u8 ID);//读温度

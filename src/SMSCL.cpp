@@ -65,11 +65,6 @@ int SMSCL::RegWritePos(u8 ID, s16 Position, u16 Speed, u16 Time, u8 ACC)
   return writePos(ID, Position, Speed, Time, ACC, INST_REG_WRITE);
 }
 
-void SMSCL::RegWriteAction()
-{
-	writeBuf(0xfe, 0, NULL, 0, INST_ACTION);
-}
-
 //写位置指令
 //舵机ID[]数组，IDN数组长度，Position位置，ACC加速度，速度Speed
 void SMSCL::SyncWritePos(u8 ID[], u8 IDN, s16 Position[], u16 Speed, u16 Time, u8 ACC)
@@ -199,22 +194,6 @@ int SMSCL::pwmMode(u8 ID)
 int SMSCL::jointMode(u8 ID, u16 minAngle, u16 maxAngle)
 {
 	return writeByte(ID, SMSCL_MODE, 0);
-}
-
-//�ָ��������ΪĬ��ֵ
-int SMSCL::Recovery(u8 ID)
-{
-	flushSCS();
-	writeBuf(ID, 0, NULL, 0, INST_RECOVER);
-	return Ack(ID);
-}
-
-//��λ���
-int SMSCL::Reset(u8 ID)
-{
-	flushSCS();
-	writeBuf(ID, 0, NULL, 0, INST_RESET);
-	return Ack(ID);
 }
 
 int SMSCL::WriteOfs(u8 ID, s16 Ofs)
