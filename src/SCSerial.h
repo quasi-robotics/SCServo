@@ -36,7 +36,7 @@ public:
         this->IOTimeOut = IOTimeOut;
     }
 
-    virtual int write(unsigned char *nDat, int nLen) = 0;//输出nLen字节
+    virtual int write(const unsigned char *nDat, int nLen) = 0;//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen) = 0;//输入nLen字节
     virtual int write(unsigned char bDat) = 0;//输出1字节
     virtual void flush() = 0;//刷新接口缓冲区
@@ -99,9 +99,9 @@ public:
     virtual int getErr(){  return Err;  }
 
 protected:
-    virtual int readSCS(unsigned char *nDat, int nLen) { return pSerial->read(nDat, nLen); }
-    virtual int writeSCS(unsigned char *nDat, int nLen) { return pSerial->write(nDat, nLen); }
-    virtual int writeSCS(unsigned char bDat) {return pSerial->write(bDat); }
+    virtual int readSCS(u8 *nDat, int nLen) { return pSerial->read(nDat, nLen); }
+    virtual int writeSCS(const u8 *nDat, int nLen) { return pSerial->write(nDat, nLen); }
+    virtual int writeSCS(u8 bDat) {return pSerial->write(bDat); }
     virtual void flushSCS() { return pSerial->flush(); }
 
     SerialIO* pSerial;//串口指针
@@ -115,7 +115,7 @@ class ArduinoSerial : public SerialIO {
 public:
     ArduinoSerial(HardwareSerial *pSerial, unsigned long int IOTimeOut = 100) : pSerial(pSerial), SerialIO( IOTimeOut) {}
 
-    virtual int write(unsigned char *nDat, int nLen);//输出nLen字节
+    virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
     virtual int write(unsigned char bDat);//输出1字节
     virtual void flush();//刷新接口缓冲区
@@ -134,7 +134,7 @@ public:
     WindowsSerial(unsigned long int IOTimeOut = 100) : SerialIO(IOTimeOut), serial_handle_(INVALID_HANDLE_VALUE) {}
     virtual ~WindowsSerial() { end(); }
 
-    virtual int write(unsigned char *nDat, int nLen);//输出nLen字节
+    virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
     virtual int write(unsigned char bDat);//输出1字节
     virtual void flush();//刷新接口缓冲区
@@ -154,7 +154,7 @@ public:
     LinuxSerial(unsigned long int IOTimeOut = 100) : SerialIO(IOTimeOut), fd(-1) {}
     virtual ~LinuxSerial() { end(); }
 
-    virtual int write(unsigned char *nDat, int nLen);//输出nLen字节
+    virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
     virtual int write(unsigned char bDat);//输出1字节
     virtual void flush();//刷新接口缓冲区

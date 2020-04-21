@@ -79,7 +79,7 @@ int ArduinoSerial::read(unsigned char *nDat, int nLen)
   return Size;
 }
 
-int ArduinoSerial::write(unsigned char *nDat, int nLen)
+int ArduinoSerial::write(const unsigned char *nDat, int nLen)
 {
   if(nDat==NULL){
     return 0;
@@ -195,7 +195,7 @@ int WindowsSerial::read(unsigned char *nDat, int nLen) {
     return (int)dwRead;
 }
 
-int WindowsSerial::write(unsigned char *nDat, int nLen) {
+int WindowsSerial::write(const unsigned char *nDat, int nLen) {
     DWORD dwWrite = 0;
 
     if (WriteFile(serial_handle_, nDat, (DWORD)nLen, &dwWrite, NULL) == FALSE)
@@ -330,7 +330,7 @@ int LinuxSerial::read(unsigned char *nDat, int nLen) {
   }
 }
 
-int LinuxSerial::write(unsigned char *nDat, int nLen) {
+int LinuxSerial::write(const unsigned char *nDat, int nLen) {
   return ::write(fd, nDat, nLen);
 }
 
