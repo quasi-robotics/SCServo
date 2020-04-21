@@ -345,7 +345,7 @@ void LinuxSerial::flush() {
 
 SerialIO *SerialIO::getSerialIO(unsigned long int IOTimeOut) {
 #if defined(__linux__)
-    return new LinuxSerial(IOTimeOut));
+    return new LinuxSerial(IOTimeOut);
 //#elif defined(__APPLE__)
 //    return (PortHandler *)(new PortHandlerMac(port_name));
 #elif defined(_WIN32) || defined(_WIN64)
