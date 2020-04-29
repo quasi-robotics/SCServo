@@ -20,8 +20,10 @@
 
 //内存表定义
 //-------EPROM(只读)--------
-#define SMSCL_VERSION_L 3
-#define SMSCL_VERSION_H 4
+#define SMSCL_VERSION_L 0
+#define SMSCL_VERSION_H 1
+#define SMSCL_MODEL_L 3
+#define SMSCL_MODEL_H 4
 
 //-------EPROM(读写)--------
 #define SMSCL_ID 5
