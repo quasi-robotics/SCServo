@@ -8,8 +8,8 @@
 #include "SCSerial.h"
 
 #if !defined(ARDUINO) && !defined(_MSC_VER)
-#include <fcntl.h>
-#include <sys/select.h>
+  #include <fcntl.h>
+  #include <sys/select.h>
 #endif
 
 SCSerial::SCSerial(SerialIO* pSerial)
@@ -215,7 +215,10 @@ void WindowsSerial::flush() {
     PurgeComm(serial_handle_, PURGE_RXABORT | PURGE_RXCLEAR);
 }
 
-#else
+#elif defined(__linux__)
+#include <sys/ioctl.h>
+#include <linux/serial.h>
+
 // LinuxSerial
 
 bool LinuxSerial::begin(int baudRate, const char* serialPort)
@@ -291,12 +294,18 @@ bool LinuxSerial::setBaudRate(int baudRate)
   curopt.c_cflag |= CLOCAL;//disable modem status check
   cfmakeraw(&curopt);//make raw mode
   curopt.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  if(tcsetattr(fd, TCSANOW, &curopt) == 0){
-    return true;
-  }else{
-    perror("tcsetattr:");
+  if(tcsetattr(fd, TCSANOW, &curopt) != 0)
     return false;
-  }
+
+  struct serial_struct serinfo;
+  serinfo.reserved_char[0] = 0;
+  if( ioctl(fd, TIOCGSERIAL, &serinfo) < 0 )
+    return false;
+  serinfo.flags |= ASYNC_LOW_LATENCY;
+  if( ioctl(fd, TIOCSSERIAL, &serinfo) < 0 )
+    return false;
+
+  return true;
 }
 
 void LinuxSerial::end()
