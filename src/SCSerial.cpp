@@ -131,7 +131,7 @@ bool WindowsSerial::begin(int baudrate, const char* port_name)
     // Timeout (Not using timeout)
     // Immediatly return
     timeouts.ReadIntervalTimeout = 0;
-    timeouts.ReadTotalTimeoutMultiplier = 0;
+    timeouts.ReadTotalTimeoutMultiplier = 1;
     timeouts.ReadTotalTimeoutConstant = IOTimeOut; // must not be zero.
     timeouts.WriteTotalTimeoutMultiplier = 0;
     timeouts.WriteTotalTimeoutConstant = 0;
