@@ -246,7 +246,6 @@ bool LinuxSerial::setBaudRate(int baudRate)
   if(fd==-1){
     return false;
   }
-  tcgetattr(fd, &orgopt);
   tcgetattr(fd, &curopt);
   speed_t CR_BAUDRATE;
   switch(baudRate){

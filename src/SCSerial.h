@@ -141,7 +141,7 @@ public:
 
     virtual bool setBaudRate(int baudRate);
     virtual bool begin(int baudRate, const char* serialPort);
-    virtual void end();
+    void end();
 
 protected:
     HANDLE  serial_handle_;
@@ -152,20 +152,21 @@ protected:
 class LinuxSerial : public SerialIO {
 public:
     LinuxSerial(unsigned long int IOTimeOut = 100) : SerialIO(IOTimeOut), fd(-1) {}
-    virtual ~LinuxSerial() { end(); }
+    ~LinuxSerial() override { end(); }
 
-    virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
-    virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
-    virtual int write(unsigned char bDat);//输出1字节
-    virtual void flush();//刷新接口缓冲区
+    int read(unsigned char *nDat, int nLen) override;
 
-    virtual bool setBaudRate(int baudRate);
-    virtual bool begin(int baudRate, const char* serialPort);
-    virtual void end();
+    int write(const unsigned char *nDat, int nLen);
+    int write(unsigned char bDat) override;
+
+    void flush() override;
+
+    bool setBaudRate(int baudRate) override;
+    bool begin(int baudRate, const char* serialPort) override;
+    void end();
 
 protected:
     int fd;//serial port handle
-    struct termios orgopt;//fd ort opt
     struct termios curopt;//fd cur opt
 };
 
