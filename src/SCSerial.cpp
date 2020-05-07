@@ -218,6 +218,7 @@ void WindowsSerial::flush() {
 #elif defined(__linux__)
 #include <sys/ioctl.h>
 #include <linux/serial.h>
+#include <sys/errno.h>
 
 // LinuxSerial
 
@@ -298,11 +299,13 @@ bool LinuxSerial::setBaudRate(int baudRate)
 
   struct serial_struct serinfo;
   serinfo.reserved_char[0] = 0;
-  if( ioctl(fd, TIOCGSERIAL, &serinfo) < 0 )
-    return false;
-  serinfo.flags |= ASYNC_LOW_LATENCY;
-  if( ioctl(fd, TIOCSSERIAL, &serinfo) < 0 )
-    return false;
+  if( ioctl(fd, TIOCGSERIAL, &serinfo) >= 0 ) {
+      serinfo.flags |= ASYNC_LOW_LATENCY;
+      if( ioctl(fd, TIOCSSERIAL, &serinfo) < 0 )
+          return false;
+  }
+  else if( errno != ENOTTY )
+      return false;
 
   return true;
 }
