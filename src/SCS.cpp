@@ -511,13 +511,13 @@ bool LinuxSerial::begin(int baudRate, const char* serialPort)
   //printf("servo port:%s\n", serialPort);
   if(serialPort == NULL)
     return false;
-  fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
+  fd = open(serialPort, O_RDWR | O_NOCTTY /*| O_NONBLOCK*/);
   if(fd == -1){
     //perror("open:");
     return false;
   }
 
-  fcntl(fd, F_SETFL, O_NONBLOCK);
+//  fcntl(fd, F_SETFL, O_NONBLOCK);
 
   return setBaudRate(baudRate);
 }
@@ -574,6 +574,9 @@ bool LinuxSerial::setBaudRate(int baudRate)
   curopt.c_cflag |= CLOCAL;//disable modem status check
   cfmakeraw(&curopt);//make raw mode
   curopt.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  curopt.c_cc[VTIME] = (IOTimeOut > 0 && IOTimeOut < 100) ? 1 : IOTimeOut / 100;
+  curopt.c_cc[VMIN] = 0;
+
   if(tcsetattr(fd, TCSANOW, &curopt) != 0)
     return false;
 
@@ -598,27 +601,7 @@ void LinuxSerial::end()
 }
 
 int LinuxSerial::read(unsigned char *nDat, int nLen) {
-  int fs_sel;
-  fd_set fs_read;
-
-  struct timeval time;
-
-  FD_ZERO(&fs_read);
-  FD_SET(fd,&fs_read);
-
-  time.tv_sec = 0;
-  time.tv_usec = IOTimeOut*1000;
-
-  //使用select实现串口的多路通信
-  fs_sel = select(fd+1, &fs_read, NULL, NULL, &time);
-  if(fs_sel){
-    fs_sel = ::read(fd, nDat, nLen);
-    //printf("nLen = %d fs_sel = %d\n", nLen, fs_sel);
-    return fs_sel;
-  }else{
-    //printf("serial read fd read return 0\n");
-    return 0;
-  }
+    return ::read(fd, nDat, nLen);
 }
 
 int LinuxSerial::write(const unsigned char *nDat, int nLen) {
