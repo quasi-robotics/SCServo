@@ -4,6 +4,8 @@
 #if !defined(ARDUINO) && !defined(_MSC_VER)
   #include <fcntl.h>
   #include <sys/select.h>
+#include <alloca.h>
+
 #endif
 
 SCS::SCS(SerialIO* pSerial)
@@ -134,17 +136,25 @@ void SCS::syncWrite(const u8 *ID, u8 IDN, u8 MemAddr, const u8 *nDat, u8 nLen)
 	bBuf[6] = nLen;
 	writeSCS(bBuf, 7);
 
+	u8* mesbuf = static_cast<u8*>(alloca(mesLen - 3));
+
 	Sum = 0xfe + mesLen + INST_SYNC_WRITE + MemAddr + nLen;
 	u8 i, j;
 	for(i=0; i<IDN; i++){
-		writeSCS(ID[i]);
-		writeSCS(nDat+i*nLen, nLen);
+	    memcpy(mesbuf + (nLen+1)*i, &ID[i], 1);
+		//writeSCS(ID[i]);
+        memcpy(mesbuf + (nLen+1)*i + 1, nDat+i*nLen, nLen);
+		//writeSCS(nDat+i*nLen, nLen);
 		Sum += ID[i];
 		for(j=0; j<nLen; j++){
 			Sum += nDat[i*nLen+j];
 		}
 	}
-	writeSCS(~Sum);
+	Sum = ~Sum;
+    memcpy(mesbuf + (nLen+1)*IDN, &Sum, 1);
+	//writeSCS(Sum);
+
+	writeSCS(mesbuf, mesLen - 3);
 }
 
 int SCS::writeByte(u8 ID, u8 MemAddr, u8 bDat)
@@ -256,16 +266,16 @@ int	SCS::Ping(u8 ID)
 	writeBuf(ID, 0, NULL, 0, INST_PING);
 	Size = readSCS(bBuf, 6);
 	if(Size!=6){
-		Error = -1;
+		Error = Size;
 		return -1;
 	}
 	if(bBuf[0]!=0xff || bBuf[1]!=0xff){
-		Error = -1;
+		Error = -2;
 		return -1;		
 	}
 	u8 calSum = ~(bBuf[2]+bBuf[3]+bBuf[4]);
 	if(calSum!=bBuf[5]){
-		Error = -1;
+		Error = -3;
 		return -1;			
 	}
 	Error = bBuf[4];
@@ -601,7 +611,18 @@ void LinuxSerial::end()
 }
 
 int LinuxSerial::read(unsigned char *nDat, int nLen) {
-    return ::read(fd, nDat, nLen);
+    int br = 0;
+
+    while( br < nLen ) {
+        int n = ::read(fd, nDat + br, nLen - br);
+        if( n < 0 )         // error
+            return n;
+        else if( n == 0 )   // timeout, br is all we got
+            return br;
+        else
+            br += n;
+    }
+    return br;
 }
 
 int LinuxSerial::write(const unsigned char *nDat, int nLen) {
