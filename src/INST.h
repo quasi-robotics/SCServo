@@ -24,4 +24,6 @@ typedef		long			s32;
 #define INST_SYNC_WRITE 0x83
 #define INST_RESET 0x0a
 
+#define FEETECH_BROADCAST_ID 0xfe
+
 #endif

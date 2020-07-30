@@ -236,7 +236,7 @@ int SCS::readWord(u8 ID, u8 MemAddr)
 int	SCS::Ack(u8 ID)
 {
 	Error = 0;
-	if(ID != 0xfe && Level){
+	if(ID != FEETECH_BROADCAST_ID && Level){
 		u8 bBuf[6];
 		u8 Size = readSCS(bBuf, 6);
 		if(Size!=6){
