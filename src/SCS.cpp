@@ -4,7 +4,8 @@
 #if !defined(ARDUINO) && !defined(_MSC_VER)
   #include <fcntl.h>
   #include <sys/select.h>
-#include <alloca.h>
+  #include <alloca.h>
+  #include <stdio.h>
 
 #endif
 
@@ -180,17 +181,22 @@ int SCS::Read(u8 ID, u8 MemAddr, u8 *nData, u8 nLen)
 	flushSCS();
 	writeBuf(ID, MemAddr, &nLen, 1, INST_READ);
 	u8 bBuf[6];
-	if(readSCS(bBuf, 5)!=5){
+    int nr = readSCS(bBuf, 5);
+	if(nr!=5){
+	    fprintf(stderr, "Read less than 5 bytes: %d\n", nr);
 		Error = -1;
 		return 0;
 	}
 	if(bBuf[0]!=0xff || bBuf[1]!=0xff){
+        fprintf(stderr, "Bytes 0 and 1 are not FF\n");
 		Error = -1;
 		return -1;		
 	}
 	int Size = readSCS(nData, nLen);
 
-	if(readSCS(bBuf+5, 1)!=1){
+	nr = readSCS(bBuf+5, 1);
+	if(nr!=1){
+        fprintf(stderr, "Read less than 1 byte: %d\n", nr);
 		Error = -1;
 		return 0;
 	}
@@ -201,6 +207,7 @@ int SCS::Read(u8 ID, u8 MemAddr, u8 *nData, u8 nLen)
 	}
 	calSum = ~calSum;
 	if(calSum!=bBuf[5]){
+        fprintf(stderr, "Invalid checksum\n");
 		Error = -1;
 		return 0;
 	}
@@ -227,8 +234,10 @@ int SCS::readWord(u8 ID, u8 MemAddr)
 	int Size;
 	u16 wDat;
 	Size = Read(ID, MemAddr, nDat, 2);
-	if(Size!=2)
-		return -1;
+	if(Size!=2) {
+        fprintf(stderr, "Read less than 2 bytes: %d\n", Size);
+        return -1;
+    }
 	wDat = SCS2Host(nDat[0], nDat[1]);
 	return wDat;
 }
@@ -240,15 +249,18 @@ int	SCS::Ack(u8 ID)
 		u8 bBuf[6];
 		u8 Size = readSCS(bBuf, 6);
 		if(Size!=6){
+            fprintf(stdout, "Ack read less than 6 bytes: %d\n",  Size);
 			Error = -1;
 			return 0;
 		}
 		if(bBuf[0]!=0xff || bBuf[1]!=0xff){
+            fprintf(stdout, "Bytes 0 and 1 are not FF\n");
 			Error = -1;
 			return -1;		
 		}
 		u8 calSum = ~(bBuf[2]+bBuf[3]+bBuf[4]);
 		if(calSum!=bBuf[5]){
+            fprintf(stdout, "Checksum failed\n");
 			Error = -1;
 			return -1;			
 		}
