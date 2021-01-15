@@ -79,7 +79,7 @@ public:
 	u8	End;//处理器大小端结构
 	s8	Error;
 
-protected:
+public:
     int readSCS(u8 *nDat, int nLen) { return pSerial->read(nDat, nLen); }
     int writeSCS(const u8 *nDat, int nLen) { return pSerial->write(nDat, nLen); }
     int writeSCS(u8 bDat) {return pSerial->write(bDat); }
@@ -88,7 +88,6 @@ protected:
 
     SerialIO* pSerial;//串口指针
 
-protected:
 	void writeBuf(u8 ID, u8 MemAddr, u8 *nDat, u8 nLen, u8 Fun);
 	void Host2SCS(u8 *DataL, u8* DataH, u16 Data);//1个16位数拆分为2个8位数
 	u16	SCS2Host(u8 DataL, u8 DataH);//2个8位数组合为1个16位数
