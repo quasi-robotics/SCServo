@@ -8,7 +8,7 @@
 #ifndef _INST_H
 #define _INST_H
 
-typedef		char			s8;
+typedef		signed char	    s8;
 typedef		unsigned char	u8;	
 typedef		unsigned short	u16;	
 typedef		short			s16;
