@@ -558,6 +558,9 @@ bool LinuxSerial::setBaudRate(int baudRate)
     case 230400:
       CR_BAUDRATE = B230400;
       break;
+    case 460800:
+      CR_BAUDRATE = B460800;
+      break;
 #if defined(B500000)
     case 500000:
       CR_BAUDRATE = B500000;
