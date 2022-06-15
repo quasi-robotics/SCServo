@@ -3,11 +3,15 @@
 
 #if defined(ARDUINO)
     #include "Arduino.h"
+
+    struct iovec {
+        void  *iov_base;    /* Starting address */
+        size_t iov_len;     /* Number of bytes to transfer */
+    };
 #else
     #include <stdio.h>
     #include <fcntl.h>
     #include <string.h>
-    #include <vector>
 
     #if defined(_MSC_VER)
         #include <windows.h>
@@ -45,7 +49,7 @@ public:
     virtual int read(unsigned char *nDat, int nLen) = 0;//输入nLen字节
     virtual int write(const unsigned char *nDat, int nLen) = 0;//输出nLen字节
     virtual int write(unsigned char bDat) = 0;//输出1字节
-    virtual int writev(const std::vector<iovec>& iov) = 0;
+    virtual int writev(const iovec* iov, size_t n) = 0;
     virtual void flush() = 0;//刷新接口缓冲区
 
     virtual bool setBaudRate(int baudRate) = 0;
@@ -83,7 +87,7 @@ public:
     int readSCS(u8 *nDat, int nLen) { return pSerial->read(nDat, nLen); }
     int writeSCS(const u8 *nDat, int nLen) { return pSerial->write(nDat, nLen); }
     int writeSCS(u8 bDat) {return pSerial->write(bDat); }
-    int writeSCS(const std::vector<iovec>& iov) {return pSerial->writev(iov);}
+    int writeSCS(const iovec* iov, size_t n) {return pSerial->writev(iov, n);}
     void flushSCS() { return pSerial->flush(); }
 
     SerialIO* pSerial;//串口指针
@@ -103,6 +107,7 @@ public:
     virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
     virtual int write(unsigned char bDat);//输出1字节
+    int writev(const iovec* iov, size_t n) override;
     virtual void flush();//刷新接口缓冲区
 
     virtual bool setBaudRate(int baudRate);
@@ -122,7 +127,7 @@ public:
     int read(unsigned char *nDat, int nLen) override;
     int write(const unsigned char *nDat, int nLen) override;
     int write(unsigned char bDat) override;
-    int writev(const std::vector<iovec>& iov) override;
+    int writev(const iovec* iov, size_t n) override;
     void flush() override;
 
     bool setBaudRate(int baudRate) override;
@@ -144,7 +149,7 @@ public:
 
     int write(const unsigned char *nDat, int nLen);
     int write(unsigned char bDat) override;
-    int writev(const std::vector<iovec>& iov) override;
+    int writev(const iovec* iov, size_t n) override;
 
     void flush() override;
 

@@ -4,9 +4,8 @@
 #if !defined(ARDUINO) && !defined(_MSC_VER)
   #include <fcntl.h>
   #include <sys/select.h>
-#include <alloca.h>
-
 #endif
+#include <alloca.h>
 
 SCS::SCS(SerialIO* pSerial)
 {
@@ -64,8 +63,8 @@ u16 SCS::SCS2Host(u8 DataL, u8 DataH)
 
 void SCS::writeBuf(u8 ID, u8 MemAddr, u8 *nDat, u8 nLen, u8 Fun)
 {
-    std::vector<iovec> iov;
-    iov.reserve(3);
+    iovec iov[4];
+    size_t n = 0;
 
 	u8 msgLen = 2;
 	u8 bBuf[6];
@@ -80,11 +79,11 @@ void SCS::writeBuf(u8 ID, u8 MemAddr, u8 *nDat, u8 nLen, u8 Fun)
 		bBuf[3] = msgLen;
 		bBuf[5] = MemAddr;
 		//writeSCS(bBuf, 6);
-        iov.push_back({bBuf, 6});
+        iov[n++] = {bBuf, 6};
 	}else{
 		bBuf[3] = msgLen;
 		//writeSCS(bBuf, 5);
-        iov.push_back({bBuf, 5});
+        iov[n++] = {bBuf, 5};
 	}
 	CheckSum = ID + msgLen + Fun + MemAddr;
 	u8 i = 0;
@@ -93,13 +92,13 @@ void SCS::writeBuf(u8 ID, u8 MemAddr, u8 *nDat, u8 nLen, u8 Fun)
 			CheckSum += nDat[i];
 
 		//writeSCS(nDat, nLen);
-        iov.push_back({nDat, nLen});
+        iov[n++] = {nDat, nLen};
 	}
     CheckSum = ~CheckSum;
 	//writeSCS(CheckSum);
-    iov.push_back({&CheckSum, 1});
+    iov[n++] = {&CheckSum, 1};
 
-    writeSCS(iov);
+    writeSCS(iov, n);
 }
 
 //普通写指令
@@ -310,15 +309,17 @@ void SCS::RegWriteAction()
 # if defined(ARDUINO)
 // ArduinoSerial
 
-bool WindowsSerial::begin(int baudrate, const char* port_name)
+bool ArduinoSerial::begin(int baudrate, const char* port_name)
 {
     pSerial->begin(baudrate);
+    return true;
 }
 
-bool WindowsSerial::setBaudRate(int baudrate)
+bool ArduinoSerial::setBaudRate(int baudrate)
 {
     pSerial->end();
     pSerial->begin(baudrate);
+    return true;
 }
 
 int ArduinoSerial::read(unsigned char *nDat, int nLen)
@@ -370,6 +371,15 @@ int ArduinoSerial::write(const unsigned char *nDat, int nLen)
 int ArduinoSerial::write(unsigned char bDat)
 {
   return pSerial->write(&bDat, 1);
+}
+
+int ArduinoSerial::writev(const iovec* iov, size_t n) {
+    for( size_t i = 0; i < n; ++i ) {
+        if( pSerial->write((const unsigned char*)iov[i].iov_base, iov[i].iov_len) == -1)
+            return -1;
+    }
+
+    return 1;
 }
 
 void ArduinoSerial::flush()
@@ -491,10 +501,10 @@ int WindowsSerial::write(unsigned char bDat) {
     return 1;
 }
 
-int WindowsSerial::writev(const std::vector<iovec>& iovs) {
+int WindowsSerial::writev(const iovec* iov, size_t n) {
     // Unfortunately Scatter/Gather IO in Windows does not work with serial ports
-    for( const auto& iov : iovs ) {
-        if( WriteFile(serial_handle_, iov.iov_base, (DWORD)iov.iov_len, NULL, NULL) == FALSE)
+    for( size_t i; i < n; ++i ) {
+        if( WriteFile(serial_handle_, iov[i].iov_base, (DWORD)iov[i].iov_len, NULL, NULL) == FALSE)
             return -1;
     }
 
@@ -636,8 +646,8 @@ int LinuxSerial::write(unsigned char bDat) {
     return ::write(fd, &bDat, 1);
 }
 
-int LinuxSerial::writev(const std::vector<iovec>& iov) {
-    return ::writev(fd, iov.data(), iov.size());
+int LinuxSerial::writev(const iovec* iov, size_t n) {
+    return ::writev(fd, iov, n);
 }
 
 void LinuxSerial::flush() {
@@ -652,5 +662,7 @@ SerialIO *SerialIO::getSerialIO(unsigned long int IOTimeOut) {
 //    return (PortHandler *)(new PortHandlerMac(port_name));
 #elif defined(_WIN32) || defined(_WIN64)
     return new WindowsSerial(IOTimeOut);
+#else
+  return nullptr;
 #endif
 }
