@@ -102,7 +102,8 @@ public:
 
 class ArduinoSerial : public SerialIO {
 public:
-    ArduinoSerial(HardwareSerial *pSerial, unsigned long int IOTimeOut = 100) : pSerial(pSerial), SerialIO( IOTimeOut) {}
+    ArduinoSerial(HardwareSerial *pSerial, unsigned long int IOTimeOut = 100, int dir_pin = -1) : 
+        pSerial(pSerial), SerialIO( IOTimeOut), dir_pin_(dir_pin) {}
 
     virtual int write(const unsigned char *nDat, int nLen);//输出nLen字节
     virtual int read(unsigned char *nDat, int nLen);//输入nLen字节
@@ -111,10 +112,13 @@ public:
     virtual void flush();//刷新接口缓冲区
 
     virtual bool setBaudRate(int baudRate);
-    virtual bool begin(int baudRate, const char* serialPort);
+    virtual bool begin(int baudRate, const char* serialPort = nullptr);
 
 protected:
     HardwareSerial *pSerial;//串口指针
+    int dir_pin_;
+
+    friend class DirectionControl;
 };
 
 #elif defined(_MSC_VER)

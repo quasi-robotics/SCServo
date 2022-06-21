@@ -309,9 +309,30 @@ void SCS::RegWriteAction()
 # if defined(ARDUINO)
 // ArduinoSerial
 
+class DirectionControl {
+  public:
+    DirectionControl(ArduinoSerial* pSerialIO) : pSerialIO_(pSerialIO) {
+      if(pSerialIO_->dir_pin_ >= 0)
+        digitalWrite(pSerialIO_->dir_pin_, HIGH);
+    }
+
+    ~DirectionControl() {
+      if(pSerialIO_->dir_pin_ >= 0)
+        pSerialIO_->pSerial->flush();
+        digitalWrite(pSerialIO_->dir_pin_, LOW);
+    }
+    
+  private:
+    ArduinoSerial* pSerialIO_;
+};
+
 bool ArduinoSerial::begin(int baudrate, const char* port_name)
 {
     pSerial->begin(baudrate);
+    if(dir_pin_ >= 0) {
+      pinMode(dir_pin_, OUTPUT);
+      digitalWrite(dir_pin_, LOW);
+    }
     return true;
 }
 
@@ -362,24 +383,29 @@ int ArduinoSerial::read(unsigned char *nDat, int nLen)
 
 int ArduinoSerial::write(const unsigned char *nDat, int nLen)
 {
-  if(nDat==NULL){
+  if(nDat==NULL)
     return 0;
-  }
+  DirectionControl dc(this);
   return pSerial->write(nDat, nLen);
 }
 
 int ArduinoSerial::write(unsigned char bDat)
 {
+  DirectionControl dc(this);
   return pSerial->write(&bDat, 1);
 }
 
 int ArduinoSerial::writev(const iovec* iov, size_t n) {
-    for( size_t i = 0; i < n; ++i ) {
-        if( pSerial->write((const unsigned char*)iov[i].iov_base, iov[i].iov_len) == -1)
-            return -1;
-    }
+  DirectionControl dc(this);
+  for( size_t i = 0; i < n; ++i ) {
+      if( pSerial->write((const unsigned char*)iov[i].iov_base, iov[i].iov_len) == -1) {
+          if(dir_pin_ >= 0)
+            digitalWrite(dir_pin_, LOW);
+          return -1;
+      }
+  }
 
-    return 1;
+  return 1;
 }
 
 void ArduinoSerial::flush()
